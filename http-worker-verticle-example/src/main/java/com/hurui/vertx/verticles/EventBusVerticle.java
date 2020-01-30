@@ -42,8 +42,8 @@ public class EventBusVerticle extends AbstractVerticle {
 					message.setHttpStatusCode(500);
 					handler.reply(message);
 				}
-				logger.info("Completed request");
-			}, null);
+				blockingCodeHandler.complete(); //complete the blocking future
+			}, res -> logger.info("Completed request"));
 		});
 		
 		eventBus.localConsumer("my-queue-timeout", handler-> {
@@ -69,8 +69,8 @@ public class EventBusVerticle extends AbstractVerticle {
 					message.setHttpStatusCode(500);
 					handler.reply(message);
 				}
-				logger.info("Completed request");
-			}, null);
+				blockingCodeHandler.complete(); //complete the blocking future
+			}, res -> logger.info("Completed request"));
 		});
 	}
 	
