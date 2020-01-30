@@ -41,7 +41,7 @@ public class HttpWorkerVerticleExampleApplication {
 				.setWorker(true); //enable worker verticles on EventBus eventloop to process thread blocking tasks
 		
 		//get the EventBus verticle ready before exposing the http service
-		vertx.deployVerticle(EventBusVerticle.class, eventBusDeploymentOptions, completionHandler-> {
+		vertx.deployVerticle(eventBusVerticle, eventBusDeploymentOptions, completionHandler-> {
 			if(completionHandler.succeeded()) {
 				logger.info("EventBus verticle deployed successfully");
 			} else {
