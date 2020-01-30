@@ -2,6 +2,7 @@ package com.hurui.vertx.verticles;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.hurui.vertx.messagecodec.GenericApiEventMessage;
@@ -10,6 +11,7 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
 
+@Service
 public class EventBusVerticle extends AbstractVerticle {
 	
 	private static final Logger logger = LoggerFactory.getLogger(new Object() { }.getClass().getEnclosingClass());
@@ -29,7 +31,7 @@ public class EventBusVerticle extends AbstractVerticle {
 					//2) pass this instance of GenericApiEventMessage to a series of blocking code and fill in the necessary data in order to format a response
 					execute(message);
 					
-					//3) 
+					//3) send response to controller
 					logger.info("Sending response: " + message.getJsonRespString());
 					handler.reply(message);
 				} catch(Exception ex) {
@@ -55,7 +57,7 @@ public class EventBusVerticle extends AbstractVerticle {
 					//2) pass this instance of GenericApiEventMessage to a series of blocking code and fill in the necessary data in order to format a response
 					executeTimeout(message);
 					
-					//3) 		
+					//3) send response to controller	
 					logger.info("Sending response: " + message.getJsonRespString());
 					handler.reply(message);
 					logger.info("Although there's no way to know if HTTP eventloop has alreay sent client error code 500, we should always persist the data properly: " + message.getJsonRespString());

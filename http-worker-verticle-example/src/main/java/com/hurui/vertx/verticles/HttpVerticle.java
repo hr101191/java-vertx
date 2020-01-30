@@ -2,7 +2,10 @@ package com.hurui.vertx.verticles;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import com.hurui.vertx.controller.Controller;
 import com.hurui.vertx.messagecodec.GenericApiEventMessage;
 import com.hurui.vertx.messagecodec.GenericApiEventMessageCodec;
 
@@ -11,15 +14,17 @@ import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
-import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.net.JksOptions;
-import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.TimeoutHandler;
 
+@Service
 public class HttpVerticle extends AbstractVerticle {
 	private static final Logger logger = LoggerFactory.getLogger(new Object() { }.getClass().getEnclosingClass());
+	
+	@Autowired
+	private Controller controller;
 	
 	@Override
 	public void start() {
@@ -43,86 +48,18 @@ public class HttpVerticle extends AbstractVerticle {
 		router.route().handler(BodyHandler.create()); //To handle the response body
 		router.route().handler(TimeoutHandler.create(5000)); //Timeout handler
 		
-		//Configure your controller to route the request to be handled by the eventbus
-		//Should contain as little logic as possible here
-		Route getRoute = router.route(HttpMethod.GET, "/api/get");	
-		getRoute.handler(routingContext -> {
-			logger.info("Received request...");
-			HttpServerResponse response = routingContext.response();
-			response.putHeader("content-type", "application/json");
-			eventBus.request("my-queue", new GenericApiEventMessage(), replyHandler-> {
-				if (replyHandler.succeeded()) {
-					GenericApiEventMessage message = (GenericApiEventMessage) replyHandler.result().body();
-					response.setStatusCode(message.getHttpStatusCode());
-					response.end(message.getJsonRespString());
-				} else {
-					response.setStatusCode(500);
-					response.end("{\"status\":\"no reply from eventbus\"}");
-				}
-			});			
-		});
-		
-		Route postRoute = router.route(HttpMethod.POST, "/api/post");	
-		postRoute.handler(routingContext -> {
-			logger.info("Received request...");
-			HttpServerResponse response = routingContext.response();
-			response.putHeader("content-type", "application/json");
-			
-			GenericApiEventMessage newMessage = new GenericApiEventMessage();
-			String jsonString = routingContext.getBodyAsString();
-			newMessage.setJsonReqString(jsonString);
-			eventBus.request("my-queue", newMessage, replyHandler-> {
-				if (replyHandler.succeeded()) {
-					GenericApiEventMessage message = (GenericApiEventMessage) replyHandler.result().body();
-					response.setStatusCode(message.getHttpStatusCode());
-					response.end(message.getJsonRespString());
-				} else {
-					response.setStatusCode(500);
-					response.end("{\"status\":\"no reply from eventbus\"}");
-				}
-			});
-		});	
-		
-		Route getRouteTimeout = router.route(HttpMethod.GET, "/api/get/timeout");	
-		getRouteTimeout.handler(routingContext -> {
-			logger.info("Received request...");
-			HttpServerResponse response = routingContext.response();
-			response.putHeader("content-type", "application/json");
-			eventBus.request("my-queue-timeout", new GenericApiEventMessage(), replyHandler-> {
-				if (replyHandler.succeeded()) {
-					GenericApiEventMessage message = (GenericApiEventMessage) replyHandler.result().body();
-					response.setStatusCode(message.getHttpStatusCode());
-					response.end(message.getJsonRespString());
-				} else {
-					response.setStatusCode(500);
-					response.end("{\"status\":\"no reply from eventbus\"}");
-				}
-			});			
-		});
-		
-		Route postRouteTimeout = router.route(HttpMethod.POST, "/api/post/timeout");	
-		postRouteTimeout.handler(routingContext -> {
-			logger.info("Received request...");
-			HttpServerResponse response = routingContext.response();
-			response.putHeader("content-type", "application/json");
-			
-			GenericApiEventMessage newMessage = new GenericApiEventMessage();
-			String jsonString = routingContext.getBodyAsString();
-			newMessage.setJsonReqString(jsonString);
-			eventBus.request("my-queue", newMessage, replyHandler-> {
-				if (replyHandler.succeeded()) {
-					GenericApiEventMessage message = (GenericApiEventMessage) replyHandler.result().body();
-					response.setStatusCode(message.getHttpStatusCode());
-					response.end(message.getJsonRespString());
-				} else {
-					response.setStatusCode(500);
-					response.end("{\"status\":\"no reply from eventbus\"}");
-				}
-			});
-		});	
+		//Configure your route the handler method in the controller class
+		router.route(HttpMethod.GET, "/api/get").handler(routingContext -> controller.getApiHandler(routingContext, getVertx(), eventBus));
+		router.route(HttpMethod.POST, "/api/post").handler(routingContext -> controller.postApiHandler(routingContext, vertx, eventBus));
+		router.route(HttpMethod.GET, "/api/get/timeout").handler(routingContext -> controller.getTimeoutApiHandler(routingContext, vertx, eventBus));
+		router.route(HttpMethod.POST, "/api/post/timeout").handler(routingContext -> controller.postTimeoutApiHandler(routingContext, vertx, eventBus));
 		
 		HttpServer httpServer = getVertx().createHttpServer(options);
 		httpServer.requestHandler(router).listen(); //start listening
 		logger.info("Http eventloop started. listening for requests...");
 	}
+	
+	
+
+	
 }
