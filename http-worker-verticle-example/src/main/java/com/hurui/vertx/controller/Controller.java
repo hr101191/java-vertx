@@ -81,9 +81,15 @@ public class Controller {
 		response.putHeader("content-type", "application/json");
 		eventBus.request("my-queue-timeout", new GenericApiEventMessage(), replyHandler-> {
 			if (replyHandler.succeeded()) {
-				GenericApiEventMessage message = (GenericApiEventMessage) replyHandler.result().body();
-				response.setStatusCode(message.getHttpStatusCode());
-				response.end(message.getJsonRespString());
+				//Always catch exception while streaming the reply from eventbus
+				try {
+					GenericApiEventMessage message = (GenericApiEventMessage) replyHandler.result().body();
+					response.setStatusCode(message.getHttpStatusCode());
+					response.end(message.getJsonRespString());
+				} catch(Exception ex) {
+					response.setStatusCode(500);
+					response.end("Internal Server Error");
+				}
 			} else {
 				response.setStatusCode(500);
 				response.end("{\"status\":\"no reply from eventbus\"}");
@@ -104,9 +110,15 @@ public class Controller {
 		newMessage.setJsonReqString(jsonString);
 		eventBus.request("my-queue-timeout", newMessage, replyHandler-> {
 			if (replyHandler.succeeded()) {
-				GenericApiEventMessage message = (GenericApiEventMessage) replyHandler.result().body();
-				response.setStatusCode(message.getHttpStatusCode());
-				response.end(message.getJsonRespString());
+				//Always catch exception while streaming the reply from eventbus
+				try {
+					GenericApiEventMessage message = (GenericApiEventMessage) replyHandler.result().body();
+					response.setStatusCode(message.getHttpStatusCode());
+					response.end(message.getJsonRespString());
+				} catch(Exception ex) {
+					response.setStatusCode(500);
+					response.end("Internal Server Error");
+				}
 			} else {
 				response.setStatusCode(500);
 				response.end("{\"status\":\"no reply from eventbus\"}");
