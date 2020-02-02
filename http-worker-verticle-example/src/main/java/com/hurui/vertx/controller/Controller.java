@@ -125,4 +125,29 @@ public class Controller {
 			}
 		});
 	}
+	
+	/*
+	 https://localhost:8080/api/javaconcurrentfuture
+	 */
+	public void getApiJavaFutureHandler(RoutingContext routingContext, Vertx vertx, EventBus eventBus) {
+		logger.info("Received request...");
+		HttpServerResponse response = routingContext.response();
+		response.putHeader("content-type", "application/json");
+		eventBus.request("my-queue-java-concurrent", new GenericApiEventMessage(), replyHandler-> {
+			if (replyHandler.succeeded()) {
+				//Always catch exception while streaming the reply from eventbus
+				try {
+					GenericApiEventMessage message = (GenericApiEventMessage) replyHandler.result().body();
+					response.setStatusCode(message.getHttpStatusCode());
+					response.end(message.getJsonRespString());
+				} catch(Exception ex) {
+					response.setStatusCode(500);
+					response.end("Internal Server Error");
+				}				
+			} else {
+				response.setStatusCode(500);
+				response.end("{\"status\":\"no reply from eventbus\"}");
+			}
+		});	
+	}
 }

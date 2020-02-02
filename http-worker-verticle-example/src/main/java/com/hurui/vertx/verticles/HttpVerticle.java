@@ -53,6 +53,7 @@ public class HttpVerticle extends AbstractVerticle {
 		router.route(HttpMethod.POST, "/api/post").handler(routingContext -> controller.postApiHandler(routingContext, vertx, eventBus));
 		router.route(HttpMethod.GET, "/api/get/timeout").handler(routingContext -> controller.getTimeoutApiHandler(routingContext, vertx, eventBus));
 		router.route(HttpMethod.POST, "/api/post/timeout").handler(routingContext -> controller.postTimeoutApiHandler(routingContext, vertx, eventBus));
+		router.route(HttpMethod.GET, "/api/get/javaconcurrentfuture").handler(routingContext -> controller.getApiJavaFutureHandler(routingContext, vertx, eventBus));
 		
 		HttpServer httpServer = getVertx().createHttpServer(options);
 		httpServer.requestHandler(router).listen(); //start listening
