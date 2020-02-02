@@ -17,7 +17,7 @@ public class AsyncServiceImpl implements AsyncService {
 	public Future<Boolean> asyncServiceJavaConcurrent(ExecutorService executor){
 		logger.info("Execute method asynchronously - " + Thread.currentThread().getName());
 		return executor.submit(() -> {
-            Thread.sleep(1000);
+            Thread.sleep(1000); //comment this line to verify that ExecutorService singleton bean is created for each request, instead of initializing only once
             logger.info("Completed execution of method asynchronously - " + Thread.currentThread().getName());
             return true; //Sample method which always returns true
         });        
