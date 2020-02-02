@@ -91,10 +91,6 @@ public class EventBusVerticle extends AbstractVerticle {
 					/*
 					 Working with single thread executor
 					 
-					 Business use case:
-					 Calling a method which checks if a customer has a saving account and 
-					 another method which checks if a customer has a current account
-					 
 					 Use this style of calling when sequence of event matters
 					 */
 					Future<Boolean> firstFuture = asyncService.asyncServiceJavaConcurrent(springAsyncConfig.asyncSingleThreadExecutor());
@@ -110,10 +106,6 @@ public class EventBusVerticle extends AbstractVerticle {
 					
 					/*
 					 Working with multi thread executor
-					 
-					 Business use case example:
-					 Calling a method which checks if a customer has a saving account and 
-					 another method which checks if a customer has a current account before loan is approved
 					 
 					 Use this style of calling when sequence of event does not matter
 					 
