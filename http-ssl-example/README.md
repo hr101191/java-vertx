@@ -33,7 +33,7 @@ This is known as the [certificate chains](https://knowledge.digicert.com/solutio
 itself. 
 
 Enterprise Scenario: 
-Your organization's contracted certificate authority is GoDaddy. You are hosting a new rest service and your rest service will call some other Apis:
+Your organization's contracted certificate authority is GoDaddy. You are hosting a new rest service and your rest service will consumed by other services:
 1. Inhouse Apis who's server certificate is also issued by GoDaddy
 2. External Apis hosted by vendor A who's server certificate is issued by DigiCert
 3. External Apis hosted by vendor B who's server certificate is issued by Entrust
@@ -48,7 +48,7 @@ Keystore:
    |-- GoDaddy Intermediate Certificate n
       |-- Your Server Cert Signed by the chain of certificates above
 
-TrustStore:
+Truststore:
 |-- GoDaddy Root Certificate
    |-- GoDaddy Intermediate Certificate 1
    |-- GoDaddy Intermediate Certificate 2
@@ -64,4 +64,29 @@ TrustStore:
    |-- Entrust Intermediate Certificate 2
    |-- ...
    |-- Entrust Intermediate Certificate n
+```
+
+Below is the setup that most people adopt, which is to use the keystore as both keystore as well as truststore. I will not discuss if this is introducing an anti-pattern here in this demo 
+but i certainly agree that this is very convenient
+Setup (Alternative):
+```
+Keystore:
+|-- GoDaddy Root Certificate
+   |-- GoDaddy Intermediate Certificate 1
+   |-- GoDaddy Intermediate Certificate 2
+   |-- ...
+   |-- GoDaddy Intermediate Certificate n
+      |-- Your Server Cert Signed by the chain of certificates above
+|-- DigiCert Root
+   |-- DigiCert Intermediate Certificate 1
+   |-- DigiCert Intermediate Certificate 2
+   |-- ...
+   |-- DigiCert Intermediate Certificate n
+|-- Entrust Root
+   |-- Entrust Intermediate Certificate 1
+   |-- Entrust Intermediate Certificate 2
+   |-- ...
+   |-- Entrust Intermediate Certificate n
+
+Truststore: Simply point truststore path programmatically to the same path as keystore.
 ```
