@@ -31,8 +31,8 @@ public class HttpVerticle extends AbstractVerticle {
 		HttpServerOptions options = new HttpServerOptions();
 		options.setSsl(true); //enable SSL
 		options.setKeyStoreOptions(new JksOptions() //configure keystore
-				.setPath("server-keystore.jks") //points to src/resources if no qualified path is provided
-				.setPassword("wibble")); 
+				.setPath("server-keystore-new.jks") //points to src/resources if no qualified path is provided
+				.setPassword("11111111")); 
 		options.addEnabledSecureTransportProtocol("TLSv1.3");
 		options.addEnabledSecureTransportProtocol("TLSv1.2");
 		options.addEnabledSecureTransportProtocol("TLSv1.1");
