@@ -16,7 +16,7 @@ keytool -genkey -keyalg {RSA} -keysize {2048} -validity {360000} -alias server -
 | `-alias` | An alias that identifys this certificate in the keystore, default will be the common name | any name of your preference |
 | `-keystore` | Full path of the output keystore (.jks format) | your preferred file path |
 | `-storepass` |  Password for this keystore (required) | something you will hopefully remember, god bless! |
-| `-ext` |  Extensions for the certificate | Subject Alternate Name (SAN) e.g. san:localhost \\\*Importance of SAN: Google Chrome will not recognize your certificate if your hostname is found in the list of SAN listed in the certificate. IE and Mozilla works fine. \\\*Also include the hostname(s) of other server(s) that you are hosting your service on |
+| `-ext` |  Extensions for the certificate | Subject Alternate Name (SAN) e.g. san:localhost\\ \*Importance of SAN: Google Chrome will not recognize your certificate if your hostname is found in the list of SAN listed in the certificate. IE and Mozilla works fine.\\ \*Also include the hostname(s) of other server(s) that you are hosting your service on |
 
 In this demo, we will create two keystores. One for each service which will communicate via https.
 
