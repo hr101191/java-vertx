@@ -8,7 +8,7 @@ Replace the {placeholder} with actual value
 ```
 keytool -genkey -keyalg {RSA} -keysize {2048} -validity {360000} -alias server -keystore server.jks -storepass 11111111 -ext san:localhost
 ```
-| Overload | Description | Sample Value |
+| Keytool Overload | Description | Sample Value |
 | --- | --- | --- |
 | `-keyalg` | Key Algorithm | RSA |
 | `-keysize` | Specifies the number of bits in the modulus during encryption | 1024, 2048 |
@@ -16,7 +16,9 @@ keytool -genkey -keyalg {RSA} -keysize {2048} -validity {360000} -alias server -
 | `-alias` | An alias that identifys this certificate in the keystore, default will be the common name | any name of your preference |
 | `-keystore` | Full path of the output keystore (.jks format) | your preferred file path |
 | `-storepass` |  Password for this keystore (required) | something you will hopefully remember, god bless! |
-| `-ext` |  Extensions for the certificate | Subject Alternate Name (SAN) e.g. san:localhost \*Importance of SAN: Google Chrome will not recognize your certificate if your hostname is found in the list of SAN listed in the certificate. IE and Mozilla works fine. |
+| `-ext` |  Extensions for the certificate | Subject Alternate Name (SAN) e.g. san:localhost \\*Importance of SAN: Google Chrome will not recognize your certificate if your hostname is found in the list of SAN listed in the certificate. IE and Mozilla works fine. \*Also include the hostname(s) of other server(s) that you are hosting your service on |
+
+In this demo, we will create two keystores. One for each service which will communicate via https.
 
 
 
