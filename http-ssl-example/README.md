@@ -10,15 +10,15 @@ keytool -genkey -keyalg {RSA} -keysize {2048} -validity {360000} -alias server -
 ```
 | Overload | Description | Sample Value |
 | --- | --- | --- |
-| -keyalg | Key Algorithm | RSA |
-| -keysize | Specifies the number of bits in the modulus during encryption | 1024, 2048 |
-| -validity | Validity period of the issued certificate | Up to 2 years for [certificates issued after 1st March 2018](https://www.trustzone.com/ssl-certificate-validity-is-now-capped-at-a-maximum-of-2-years/) |
-| -alias | An alias that identifys this certificate in the keystore, default will be the common name | any name of your preference |
-| -keystore | Full path of the output keystore (.jks format) | your preferred file path |
-| -storepass |  |  |
+| `-keyalg` | Key Algorithm | RSA |
+| `-keysize` | Specifies the number of bits in the modulus during encryption | 1024, 2048 |
+| `-validity` | Validity period of the issued certificate | Up to 2 years for [certificates issued after 1st March 2018](https://www.trustzone.com/ssl-certificate-validity-is-now-capped-at-a-maximum-of-2-years/) |
+| `-alias` | An alias that identifys this certificate in the keystore, default will be the common name | any name of your preference |
+| `-keystore` | Full path of the output keystore (.jks format) | your preferred file path |
+| `-storepass` |  Password for this keystore (required) | something you will hopefully remember, god bless! |
+| `-ext` |  Extensions for the certificate | Subject Alternate Name (SAN) e.g. san:localhost \*Importance of SAN: Google Chrome will not recognize your certificate if your hostname is found in the list of SAN listed in the certificate. IE and Mozilla works fine. |
 
 
-\*Importance of SAN: Google chrome will not recognize your certificate if your hostname is found in the list of SAN listed in the certificate. IE and Mozilla works fine.
 
 #### Exporting Certificates
 
