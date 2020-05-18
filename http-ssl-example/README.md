@@ -1,4 +1,8 @@
 
+### Description
+In this demo, we are creating two rest services which will communicate with each other over https protocol.\
+
+Both servers will host the same service /api/greeting, When invoked, it will make a https call to the other server on the same endpoint
 
 ### Setup
 
@@ -13,7 +17,7 @@ keytool -genkey -keyalg {placeholder} -keysize {placeholder} -validity {placehol
 | `-keyalg` | Key Algorithm | RSA |
 | `-keysize` | Specifies the number of bits in the modulus during encryption | 1024, 2048 |
 | `-validity` | Validity period of the issued certificate | Up to 2 years for [certificates issued after 1st March 2018](https://www.trustzone.com/ssl-certificate-validity-is-now-capped-at-a-maximum-of-2-years/) |
-| `-alias` | An alias that identifys this certificate in the keystore, default will be the common name | any name of your preference |
+| `-alias` | An alias that identifes this certificate in the keystore, default will be the common name | any name of your preference |
 | `-keystore` | Full path of the output keystore (.jks format) | your preferred file path |
 | `-storepass` |  Password for this keystore (required) | something you will hopefully remember, god bless! |
 | `-ext` |  Extensions for the certificate. Usually Subject Alternate Name (SAN) |  san:localhost\ \*Importance of SAN: Google Chrome will not recognize your certificate if your hostname is found in the list of SAN listed in the certificate. IE and Mozilla works fine.\ \*Also include the hostname(s) of other server(s) that you are hosting your service on |
@@ -67,7 +71,7 @@ Truststore:
 ```
 
 Below is the setup that most people adopt, which is to use the keystore as both keystore as well as truststore. I will not discuss if this is introducing an anti-pattern here in this demo 
-but i certainly agree that this is very convenient
+but i certainly agree that this is very convenient\
 Setup (Alternative):
 ```
 Keystore:
@@ -90,3 +94,14 @@ Keystore:
 
 Truststore: Simply point truststore path programmatically to the same path as keystore.
 ```
+
+#### Checkpoint
+Here's a quick summary of what we've done so far...\
+
+Server A:
+1) Created a keystore which identifies itself during a ssl connection
+2) Created a truststore which included server B's certificate to verify server B's identity when server B tries to establish ssl connection with server A.
+
+Server B:
+1) Created a keystore which identifies itself during a ssl connection
+2) Created a truststore which included server B's certificate to verify server B's identity when server B tries to establish ssl connection with server A.
