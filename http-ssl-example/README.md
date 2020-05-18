@@ -5,9 +5,17 @@
 #### Creating Keystore
 
 Replace the {placeholder} with actual value
+```
 keytool -genkey -keyalg {RSA} -keysize {2048} -validity {360000} -alias server -keystore server.jks -storepass 11111111 -ext san:localhost
+```
+| Overload | Description | Sample Value |
+| --- | --- | --- |
+| -keyalg | Key Algorithm | RSA |
+| -keysize | Show file differences that haven't been staged | 1024, 2048 |
+| -validity | Show file differences that haven't been staged | Up to 2 years for [certificates issued after 1st March 2018] (https://www.trustzone.com/ssl-certificate-validity-is-now-capped-at-a-maximum-of-2-years/) |
 
-**Importance of SAN: Google chrome will not recognize your certificate if your hostname is found in the list of SAN listed in the certificate. IE and Mozilla works fine.
+
+\*Importance of SAN: Google chrome will not recognize your certificate if your hostname is found in the list of SAN listed in the certificate. IE and Mozilla works fine.
 
 #### Exporting Certificates
 
