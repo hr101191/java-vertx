@@ -1,6 +1,6 @@
 
 ### Description
-In this demo, we are creating two rest services which will communicate with each other over https protocol.\
+In this demo, we are creating two rest services which will communicate with each other over https protocol.
 
 Both servers will host the same service /api/greeting, When invoked, it will make a https call to the other server on the same endpoint
 
@@ -24,7 +24,11 @@ keytool -genkey -keyalg {placeholder} -keysize {placeholder} -validity {placehol
 
 In this demo, we will create two keystores. One for each service which will communicate via https.
 
+Generating Keystore for server A:
+![Alt text](README_IMG/gen_server_a_keystore.PNG?raw=true "gen_server_a_keystore")
 
+Generating Keystore for server B:
+![Alt text](README_IMG/gen_server_b_keystore.PNG?raw=true "gen_server_b_keystore")
 
 #### Exporting Certificates/ CSR
 
@@ -96,7 +100,7 @@ Truststore: Simply point truststore path programmatically to the same path as ke
 ```
 
 #### Checkpoint
-Here's a quick summary of what we've done so far...\
+Here's a quick summary of what we've done so far...
 
 Server A:
 1) Created a keystore which identifies itself during a ssl connection
