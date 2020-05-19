@@ -71,7 +71,7 @@ Export certificate from Server B JKS:
 ![Alt text](README_IMG/export_server_b_ca.PNG?raw=true "export_server_b_ca")
 
 #### Creating Truststore and importing server certificate into Truststore
-Truststore in SSL is where you can configure whom you trust.
+Truststore is where you can configure whom you trust.
 
 Command (Replace the {placeholder} with a valid value):
 ```
@@ -84,6 +84,16 @@ keytool -import -alias {placeholder} -file {placeholder} -keystore {placeholder}
 | `-keystore` | Full path of the output keystore (.jks format) | your_preferred_file_path\\keystore_name.jks |
 | `-storepass` |  Password for this keystore (required) | something you will hopefully remember, god bless! 
 
+##### Self-signed Certificate
+For this demo, your self-signed certificate will contain the whole chain depicted above in ONE certificate. Simply import the client's self-sign certificate into your truststore
+
+Creating truststore for server A:
+![Alt text](README_IMG/server_a_truststore.PNG?raw=true "server_a_truststore")
+
+Creating truststore for server B:
+![Alt text](README_IMG/server_b_truststore.PNG?raw=true "server_b_truststore")
+
+##### Certificate issued by certificate authority
 Considering the following setup used by an external client which tries to establish TLS connection with your service:
 ```
 |-- GoDaddy Root Certificate
@@ -93,14 +103,10 @@ Considering the following setup used by an external client which tries to establ
    |-- GoDaddy Intermediate Certificate n
       |-- Client's Cert Signed by the chain of certificates above
 ```
-
-For this demo, your self-signed certificate will contain the whole chain depicted above in ONE certificate. Simply import the client's self-sign certificate into your truststore
-
-Creating truststore for server A:
-![Alt text](README_IMG/server_a_truststore.PNG?raw=true "server_a_truststore")
-
-Creating truststore for server B:
-![Alt text](README_IMG/server_b_truststore.PNG?raw=true "server_b_truststore")
+You will need to import:
+1. GoDaddy Root Certificate
+2. All GoDaddy intermediate certificate(s)
+\*Note: Client's certificate is not required. But it's ok to include (\*Think about self-signed certificate scenario)
 
 Enterprise Scenario: 
 Your organization's contracted certificate authority is GoDaddy. You are hosting a new rest service and your rest service will consumed by other services:
