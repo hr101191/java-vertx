@@ -18,7 +18,7 @@ keytool -genkey -keyalg {placeholder} -keysize {placeholder} -validity {placehol
 | `-keysize` | Specifies the number of bits in the modulus during encryption | 1024, 2048 |
 | `-validity` | Validity period of the issued certificate | Up to 2 years for [certificates issued after 1st March 2018](https://www.trustzone.com/ssl-certificate-validity-is-now-capped-at-a-maximum-of-2-years/) |
 | `-alias` | An alias that identifes this certificate in the keystore, default will be the common name | any name of your preference |
-| `-keystore` | Full path of the output keystore (.jks format) | your preferred file path\\keystore_name.jks |
+| `-keystore` | Full path of the output keystore (.jks format) | your_preferred_file_path\\keystore_name.jks |
 | `-storepass` |  Password for this keystore (required) | something you will hopefully remember, god bless! |
 | `-ext` |  Extensions for the certificate. Usually Subject Alternate Name (SAN) |  SAN=dns:localhost |
 
@@ -44,7 +44,10 @@ Generating Keystore for server B:
 #### Exporting Certificates
 \*Note: An actual server certificate issued by a recognized certificate authority will be created from one root cert and zero to many intermediate certificates. 
 This is known as the [certificate chains](https://knowledge.digicert.com/solution/SO16297.html). When establishing a TLS conneection, client will validate the server's 
-identity based on the root certificate and intermediate certificate(s) that the server certificate is generated from. For a self-signed certificate, this certificate chain is contained in 
+identity based on the root certificate and intermediate certificate(s) that the server certificate is generated from. Skip this section if you are using certificate issued by 
+a certificate authority
+
+For a self-signed certificate, this certificate chain is contained in 
 itself and therefore we will be acting as the certificate authority ourself. Hence, this step is required if you are using self-signed certificate as clients connecting to your service 
 will need your identity solely based on this certificate.
 
@@ -55,8 +58,8 @@ keytool -export -alias {placeholder} -file {placeholder} -keystore {placeholder}
 | Keytool Overload | Description | Sample Value |
 | ----- | ----- | ----- |
 | `-alias` | An alias that identifes this certificate in the keystore, default will be the common name | An alias in this keystore |
-| `-file` | Full path of the output certificate (.cer format) | your preferred file path\\certificate_name.cer |
-| `-keystore` | Full path of the output keystore (.jks format) | your preferred file path\\keystore_name.jks |
+| `-file` | Full path of the output certificate (.cer format) | your_preferred_file_path\\certificate_name.cer |
+| `-keystore` | Full path of the output keystore (.jks format) | your_preferred_file_path\\keystore_name.jks |
 | `-storepass` |  Password for this keystore (required) | something you will hopefully remember, god bless! |
 
 For this demo, we will execute the following commands:
@@ -72,8 +75,14 @@ Truststore in SSL is where you can configure whom you trust.
 
 Command (Replace the {placeholder} with a valid value):
 ```
-keytool -import -file {placeholder} -alias {placeholder} -keystore {placeholder} -storepass {placeholder}
+keytool -import -alias {placeholder} -file {placeholder} -keystore {placeholder} -storepass {placeholder}
 ```
+| Keytool Overload | Description | Sample Value |
+| ----- | ----- | ----- |
+| `-alias` | An alias that identifes this certificate in the keystore, default will be the common name | An alias to be given to this certificate in this truststore|
+| `-file` | Full path of the output certificate (.cer format) | your_preferred_file_path\\certificate_name.cer |
+| `-keystore` | Full path of the output keystore (.jks format) | your_preferred_file_path\\keystore_name.jks |
+| `-storepass` |  Password for this keystore (required) | something you will hopefully remember, god bless! 
 
 Considering the following setup used by an external client which tries to establish TLS connection with your service:
 ```
@@ -85,9 +94,7 @@ Considering the following setup used by an external client which tries to establ
       |-- Client's Cert Signed by the chain of certificates above
 ```
 
-Your self-signed certificate will contain the whole chain depicted above in ONE certificate. Simply import the client's self-sign certificate into your truststore
-
-For self
+For this demo, your self-signed certificate will contain the whole chain depicted above in ONE certificate. Simply import the client's self-sign certificate into your truststore
 
 Creating truststore for server A:
 ![Alt text](README_IMG/server_a_truststore.PNG?raw=true "server_a_truststore")
