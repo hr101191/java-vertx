@@ -1,12 +1,12 @@
 
-### Description
+## 1. Description
 In this demo, we are creating two rest services which will communicate with each other over https protocol.
 
 Both servers will host the same service /api/greeting, When invoked, it will make a https call to the other server on the same endpoint
 
-### Setup
+## 2. Setup
 
-#### Creating Keystore
+### Creating Keystore
 
 Command (Replace the {placeholder} with a valid value):
 ```
@@ -41,7 +41,7 @@ Generating Keystore for server A:
 Generating Keystore for server B:
 ![Alt text](README_IMG/gen_server_b_keystore.PNG?raw=true "gen_server_b_keystore")
 
-#### Exporting Certificates
+### Exporting Certificates
 \*Note: An actual server certificate issued by a recognized certificate authority will be created from one root cert and zero to many intermediate certificates. 
 This is known as the [certificate chains](https://knowledge.digicert.com/solution/SO16297.html). When establishing a TLS conneection, client will validate the server's 
 identity based on the root certificate and intermediate certificate(s) that the server certificate is generated from. Skip this section if you are using certificate issued by 
@@ -70,7 +70,7 @@ Export certificate from Server A JKS:
 Export certificate from Server B JKS:
 ![Alt text](README_IMG/export_server_b_ca.PNG?raw=true "export_server_b_ca")
 
-#### Creating Truststore and importing server certificate into Truststore
+### Creating Truststore and importing server certificate into Truststore
 Truststore is where you can configure whom you trust.
 
 Command (Replace the {placeholder} with a valid value):
@@ -84,7 +84,7 @@ keytool -import -alias {placeholder} -file {placeholder} -keystore {placeholder}
 | `-keystore` | Full path of the output keystore (.jks format) | your_preferred_file_path\\keystore_name.jks |
 | `-storepass` |  Password for this keystore (required) | something you will hopefully remember, god bless! 
 
-##### Self-signed Certificate
+#### Self-signed Certificate
 For this demo, your self-signed certificate will contain the whole chain depicted above in ONE certificate. Simply import the client's self-sign certificate into your truststore
 
 Creating truststore for server A:
@@ -93,7 +93,7 @@ Creating truststore for server A:
 Creating truststore for server B:
 ![Alt text](README_IMG/server_b_truststore.PNG?raw=true "server_b_truststore")
 
-##### Certificate issued by certificate authority
+#### Certificate issued by certificate authority
 Considering the following setup used by an external client which tries to establish TLS connection with your service:
 ```
 |-- GoDaddy Root Certificate
@@ -108,13 +108,13 @@ You will need to import:
 2. All GoDaddy intermediate certificate(s)
 \*Note: Client's certificate is not required. But it's ok to include (\*Think about self-signed certificate scenario)
 
-Enterprise Scenario: 
+#### Enterprise Scenario
 Your organization's contracted certificate authority is GoDaddy. You are hosting a new rest service and your rest service will consumed by other services:
 1. Inhouse Apis who's server certificate is also issued by GoDaddy
 2. External Apis hosted by vendor A who's server certificate is issued by DigiCert
 3. External Apis hosted by vendor B who's server certificate is issued by Entrust
 
-Setup:
+Setup (from your perspective):
 ```
 Keystore:
 |-- GoDaddy Root Certificate
@@ -142,9 +142,9 @@ Truststore:
    |-- Entrust Intermediate Certificate n
 ```
 
-Below is the setup that most people adopt, which is to use the keystore as both keystore as well as truststore. I will not discuss if this is introducing an anti-pattern here in this demo 
+Below is the setup that some people adopt, which is to use the keystore as both keystore as well as truststore. I will not discuss if this is introducing an anti-pattern here in this demo 
 but i certainly agree that this is very convenient\
-Setup (Alternative):
+Setup - Alternative (from your perspective):
 ```
 Keystore:
 |-- GoDaddy Root Certificate
@@ -167,7 +167,7 @@ Keystore:
 Truststore: Simply point truststore path programmatically to the same path as keystore.
 ```
 
-#### Checkpoint
+## Checkpoint
 Here's a quick summary of what we've done so far...
 
 Server A:
@@ -177,3 +177,5 @@ Server A:
 Server B:
 1) Created a keystore which identifies itself during a TLS connection
 2) Created a truststore which included server B's certificate to verify server B's identity when server B tries to establish TLS connection with server A.
+
+## Code discussion
