@@ -18,12 +18,12 @@ keytool -genkey -keyalg {placeholder} -keysize {placeholder} -validity {placehol
 | `-keysize` | Specifies the number of bits in the modulus during encryption | 1024, 2048 |
 | `-validity` | Validity period of the issued certificate | Up to 2 years for [certificates issued after 1st March 2018](https://www.trustzone.com/ssl-certificate-validity-is-now-capped-at-a-maximum-of-2-years/) |
 | `-alias` | An alias that identifes this certificate in the keystore, default will be the common name | any name of your preference |
-| `-keystore` | Full path of the output keystore (.jks format) | your preferred file path |
+| `-keystore` | Full path of the output keystore (.jks format) | your preferred file path\\keystore_name.jks |
 | `-storepass` |  Password for this keystore (required) | something you will hopefully remember, god bless! |
 | `-ext` |  Extensions for the certificate. Usually Subject Alternate Name (SAN) |  SAN=dns:localhost |
 
 \*Importance of SAN: Google Chrome will not recognize your certificate if your hostname is found in the list of SAN listed in the certificate. IE and Mozilla works fine. If you are purchasing a certificate from a certificate authority, they might require you to enter this value seperately on their portal.
-\*Also include the hostname(s) of other server(s) that you are hosting your service on
+
 \*For a cluster setup, include the dns name of all the servers hosting the service along with the dns name of your load balancer
 ```
 SAN=dns:loadbalancer,dns:hostname1,dns:hostname2
@@ -41,11 +41,25 @@ Generating Keystore for server A:
 Generating Keystore for server B:
 ![Alt text](README_IMG/gen_server_b_keystore.PNG?raw=true "gen_server_b_keystore")
 
-#### Exporting Certificates/ CSR
-For this demo, we will be acting as the certificate authority ourself. 
+#### Exporting Certificates
 \*Note: An actual server certificate issued by a recognized certificate authority will be created from one root cert and zero to many intermediate certificates. 
-This is known as the [certificate chains](https://knowledge.digicert.com/solution/SO16297.html). For a self-signed certificate, this certificate chain is contained in 
-itself. 
+This is known as the [certificate chains](https://knowledge.digicert.com/solution/SO16297.html). When establishing a TLS conneection, client will validate the server's 
+identity based on the root certificate and intermediate certificate(s) that the server certificate is generated from. For a self-signed certificate, this certificate chain is contained in 
+itself and therefore we will be acting as the certificate authority ourself. Hence, this step is required if you are using self-signed certificate as clients connecting to your service 
+will need your identity solely based on this certificate.
+
+Command (Replace the {placeholder} with a valid value):
+```
+keytool -export -alias {placeholder} -file {placeholder} -keystore {placeholder} -storepass {placeholder}
+```
+| Keytool Overload | Description | Sample Value |
+| ----- | ----- | ----- |
+| `-alias` | An alias that identifes this certificate in the keystore, default will be the common name | An alias in this keystore |
+| `-file` | Full path of the output certificate (.cer format) | your preferred file path\\certificate_name.cer |
+| `-keystore` | Full path of the output keystore (.jks format) | your preferred file path\\keystore_name.jks |
+| `-storepass` |  Password for this keystore (required) | something you will hopefully remember, god bless! |
+
+For this demo, we will execute the following commands:
 
 Export certificate from Server A JKS:
 ![Alt text](README_IMG/export_server_a_ca.PNG?raw=true "export_server_a_ca")
@@ -53,10 +67,13 @@ Export certificate from Server A JKS:
 Export certificate from Server B JKS:
 ![Alt text](README_IMG/export_server_b_ca.PNG?raw=true "export_server_b_ca")
 
-TODO: Add steps to show how to generate CSR and create a free ssl certificate signed by a Certificate Authority
-
 #### Creating Truststore and importing server certificate into Truststore
 Truststore in SSL is where you can configure whom you trust.
+
+Command (Replace the {placeholder} with a valid value):
+```
+keytool -import -file {placeholder} -alias {placeholder} -keystore {placeholder} -storepass {placeholder}
+```
 
 Considering the following setup used by an external client which tries to establish TLS connection with your service:
 ```
@@ -75,7 +92,7 @@ For self
 Creating truststore for server A:
 ![Alt text](README_IMG/server_a_truststore.PNG?raw=true "server_a_truststore")
 
-Creating truststore for server A:
+Creating truststore for server B:
 ![Alt text](README_IMG/server_b_truststore.PNG?raw=true "server_b_truststore")
 
 Enterprise Scenario: 
