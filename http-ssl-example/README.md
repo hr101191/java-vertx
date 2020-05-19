@@ -6,7 +6,7 @@ Both servers will host the same service /api/greeting, When invoked, it will mak
 
 ## 2. Setup
 
-### Creating Keystore
+### 2.1. Creating Keystore
 
 Command (Replace the {placeholder} with a valid value):
 ```
@@ -41,7 +41,7 @@ Generating Keystore for server A:
 Generating Keystore for server B:
 ![Alt text](README_IMG/gen_server_b_keystore.PNG?raw=true "gen_server_b_keystore")
 
-### Exporting Certificates
+### 2.2. Exporting Certificates
 \*Note: An actual server certificate issued by a recognized certificate authority will be created from one root cert and zero to many intermediate certificates. 
 This is known as the [certificate chains](https://knowledge.digicert.com/solution/SO16297.html). When establishing a TLS conneection, client will validate the server's 
 identity based on the root certificate and intermediate certificate(s) that the server certificate is generated from. Skip this section if you are using certificate issued by 
@@ -70,7 +70,7 @@ Export certificate from Server A JKS:
 Export certificate from Server B JKS:
 ![Alt text](README_IMG/export_server_b_ca.PNG?raw=true "export_server_b_ca")
 
-### Creating Truststore and importing server certificate into Truststore
+### 2.3. Creating Truststore and importing server certificate into Truststore
 Truststore is where you can configure whom you trust.
 
 Command (Replace the {placeholder} with a valid value):
@@ -84,7 +84,7 @@ keytool -import -alias {placeholder} -file {placeholder} -keystore {placeholder}
 | `-keystore` | Full path of the output keystore (.jks format) | your_preferred_file_path\\keystore_name.jks |
 | `-storepass` |  Password for this keystore (required) | something you will hopefully remember, god bless! 
 
-#### Self-signed Certificate
+#### 2.3.1 Self-signed Certificate
 For this demo, your self-signed certificate will contain the whole chain depicted above in ONE certificate. Simply import the client's self-sign certificate into your truststore
 
 Creating truststore for server A:
@@ -93,7 +93,7 @@ Creating truststore for server A:
 Creating truststore for server B:
 ![Alt text](README_IMG/server_b_truststore.PNG?raw=true "server_b_truststore")
 
-#### Certificate issued by certificate authority
+#### 2.3.2 Certificate issued by certificate authority
 Considering the following setup used by an external client which tries to establish TLS connection with your service:
 ```
 |-- GoDaddy Root Certificate
@@ -108,7 +108,7 @@ You will need to import:
 2. All GoDaddy intermediate certificate(s)
 \*Note: Client's certificate is not required. But it's ok to include (\*Think about self-signed certificate scenario)
 
-#### Enterprise Scenario
+#### 2.3.3 Enterprise Scenario
 Your organization's contracted certificate authority is GoDaddy. You are hosting a new rest service and your rest service will consumed by other services:
 1. Inhouse Apis who's server certificate is also issued by GoDaddy
 2. External Apis hosted by vendor A who's server certificate is issued by DigiCert
