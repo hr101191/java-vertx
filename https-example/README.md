@@ -1,3 +1,4 @@
+# Vertx SSL Example
 
 ## 1. Description
 In this demo, we are creating two rest services which will communicate with each other over https protocol.
@@ -167,7 +168,7 @@ Keystore:
 Truststore: Simply point truststore path programmatically to the same path as keystore.
 ```
 
-## Checkpoint
+## 3. Checkpoint
 Here's a quick summary of what we've done so far...
 
 Server A:
@@ -178,4 +179,6 @@ Server B:
 1) Created a keystore which identifies itself during a TLS connection
 2) Created a truststore which included server B's certificate to verify server B's identity when server B tries to establish TLS connection with server A.
 
-## Code discussion
+## 4. Code Discussion
+
+## 5. Test
