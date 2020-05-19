@@ -22,8 +22,16 @@ keytool -genkey -keyalg {placeholder} -keysize {placeholder} -validity {placehol
 | `-storepass` |  Password for this keystore (required) | something you will hopefully remember, god bless! |
 | `-ext` |  Extensions for the certificate. Usually Subject Alternate Name (SAN) |  SAN=dns:localhost |
 
-\*Importance of SAN: Google Chrome will not recognize your certificate if your hostname is found in the list of SAN listed in the certificate. IE and Mozilla works fine.
+\*Importance of SAN: Google Chrome will not recognize your certificate if your hostname is found in the list of SAN listed in the certificate. IE and Mozilla works fine. If you are purchasing a certificate from a certificate authority, they might require you to enter this value seperately on their portal.
 \*Also include the hostname(s) of other server(s) that you are hosting your service on
+\*For a cluster setup, include the dns name of all the servers hosting the service along with the dns name of your load balancer
+```
+SAN=dns:loadbalancer,dns:hostname1,dns:hostname2
+
+When prompted to enter common name, provide the dns name of your load balancer:
+What is your first and last name?
+  [Unknown]:  loadbalancer
+```
 
 In this demo, we will create two keystores. One for each service which will communicate via https.
 
@@ -35,6 +43,9 @@ Generating Keystore for server B:
 
 #### Exporting Certificates/ CSR
 For this demo, we will be acting as the certificate authority ourself. 
+\*Note: An actual server certificate issued by a recognized certificate authority will be created from one root cert and zero to many intermediate certificates. 
+This is known as the [certificate chains](https://knowledge.digicert.com/solution/SO16297.html). For a self-signed certificate, this certificate chain is contained in 
+itself. 
 
 Export certificate from Server A JKS:
 ![Alt text](README_IMG/export_server_a_ca.PNG?raw=true "export_server_a_ca")
@@ -45,12 +56,27 @@ Export certificate from Server B JKS:
 TODO: Add steps to show how to generate CSR and create a free ssl certificate signed by a Certificate Authority
 
 #### Creating Truststore and importing server certificate into Truststore
-![Alt text](README_IMG/output_to_copy.PNG?raw=true "output_to_copy")
+Truststore in SSL is where you can configure whom you trust.
 
-Truststore in SSL is where you can configure whom you trust. 
-\*Note: An actual server certificate issued by a recognized certificate authority will be created from one root cert and zero to many intermediate certificates. 
-This is known as the [certificate chains](https://knowledge.digicert.com/solution/SO16297.html). For a self-signed certificate, this certificate chain is contained in 
-itself. 
+Considering the following setup used by an external client which tries to establish TLS connection with your service:
+```
+|-- GoDaddy Root Certificate
+   |-- GoDaddy Intermediate Certificate 1
+   |-- GoDaddy Intermediate Certificate 2
+   |-- ...
+   |-- GoDaddy Intermediate Certificate n
+      |-- Client's Cert Signed by the chain of certificates above
+```
+
+Your self-signed certificate will contain the whole chain depicted above in ONE certificate. Simply import the client's self-sign certificate into your truststore
+
+For self
+
+Creating truststore for server A:
+![Alt text](README_IMG/server_a_truststore.PNG?raw=true "server_a_truststore")
+
+Creating truststore for server A:
+![Alt text](README_IMG/server_b_truststore.PNG?raw=true "server_b_truststore")
 
 Enterprise Scenario: 
 Your organization's contracted certificate authority is GoDaddy. You are hosting a new rest service and your rest service will consumed by other services:
@@ -115,9 +141,9 @@ Truststore: Simply point truststore path programmatically to the same path as ke
 Here's a quick summary of what we've done so far...
 
 Server A:
-1) Created a keystore which identifies itself during a ssl connection
-2) Created a truststore which included server B's certificate to verify server B's identity when server B tries to establish ssl connection with server A.
+1) Created a keystore which identifies itself during a TLS connection
+2) Created a truststore which included server B's certificate to verify server B's identity when server B tries to establish TLS connection with server A.
 
 Server B:
-1) Created a keystore which identifies itself during a ssl connection
-2) Created a truststore which included server B's certificate to verify server B's identity when server B tries to establish ssl connection with server A.
+1) Created a keystore which identifies itself during a TLS connection
+2) Created a truststore which included server B's certificate to verify server B's identity when server B tries to establish TLS connection with server A.
