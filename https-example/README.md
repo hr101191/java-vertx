@@ -1,4 +1,4 @@
-# Vertx SSL Example
+# Vertx Https Example
 
 ## 1. Description
 In this demo, we are creating two rest services which will communicate with each other over https protocol.
