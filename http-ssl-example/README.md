@@ -21,7 +21,8 @@ keytool -genkey -keyalg {placeholder} -keysize {placeholder} -validity {placehol
 | `-keystore` | Full path of the output keystore (.jks format) | your preferred file path |
 | `-storepass` |  Password for this keystore (required) | something you will hopefully remember, god bless! |
 | `-ext` |  Extensions for the certificate. Usually Subject Alternate Name (SAN) |  SAN=dns:localhost |
-\*Importance of SAN: Google Chrome will not recognize your certificate if your hostname is found in the list of SAN listed in the certificate. IE and Mozilla works fine.\ 
+
+\*Importance of SAN: Google Chrome will not recognize your certificate if your hostname is found in the list of SAN listed in the certificate. IE and Mozilla works fine.
 \*Also include the hostname(s) of other server(s) that you are hosting your service on
 
 In this demo, we will create two keystores. One for each service which will communicate via https.
@@ -33,6 +34,15 @@ Generating Keystore for server B:
 ![Alt text](README_IMG/gen_server_b_keystore.PNG?raw=true "gen_server_b_keystore")
 
 #### Exporting Certificates/ CSR
+For this demo, we will be acting as the certificate authority ourself. 
+
+Export certificate from Server A JKS:
+![Alt text](README_IMG/export_server_a_ca.PNG?raw=true "export_server_a_ca")
+
+Export certificate from Server B JKS:
+![Alt text](README_IMG/export_server_b_ca.PNG?raw=true "export_server_b_ca")
+
+TODO: Add steps to show how to generate CSR and create a free ssl certificate signed by a Certificate Authority
 
 #### Creating Truststore and importing server certificate into Truststore
 ![Alt text](README_IMG/output_to_copy.PNG?raw=true "output_to_copy")
