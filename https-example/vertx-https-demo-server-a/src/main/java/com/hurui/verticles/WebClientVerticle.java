@@ -60,7 +60,10 @@ public class WebClientVerticle extends AbstractVerticle {
 			}, resultHandler -> {
 				if(resultHandler.succeeded()) {
 					logger.info("EventBus Address: [{}] - sending successful response...", handler.address());
-					handler.reply(resultHandler.result());
+					JsonObject jsonObject = new JsonObject()
+							.put("isSuccess", Boolean.TRUE)
+							.put("response", resultHandler.result());
+					handler.reply(jsonObject);
 				}else {
 					logger.error("EventBus Address: [{}] - sending failure response...", handler.address());
 					JsonObject jsonObject = new JsonObject()

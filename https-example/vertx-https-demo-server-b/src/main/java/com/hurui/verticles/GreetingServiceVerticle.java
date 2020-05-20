@@ -45,12 +45,14 @@ public class GreetingServiceVerticle extends AbstractVerticle {
 					logger.info("EventBus Address: [{}] - result handler successful...", handler.address());
 					JsonObject result = (JsonObject) resultHandler.result();
 					if(result.getBoolean("isSuccess")) {
+						logger.info("EventBus Address: [{}] - Sending OK response from resultHandler...", handler.address());
 						JsonObject jsonObject = new JsonObject()
 								.put("isSuccess", Boolean.TRUE)
 								.put("statusCode", 200)
-								.put("response", resultHandler.result());
+								.put("response", result.getJsonObject("response"));
 						handler.reply(jsonObject);
 					} else {
+						logger.warn("EventBus Address: [{}] - Sending error response from resultHandler...", handler.address());
 						JsonObject jsonObject = new JsonObject()
 								.put("isSuccess", Boolean.FALSE)
 								.put("statusCode", 500)
@@ -74,14 +76,22 @@ public class GreetingServiceVerticle extends AbstractVerticle {
 		Promise<JsonObject> promise = Promise.promise();
 		eventBus.request("HTTP_GET", jsonObject, replyHandler -> {
 			if(replyHandler.succeeded()) {
-				JsonObject response = new JsonObject()
-						.put("isSuccess", Boolean.TRUE)
-						.put("response", replyHandler.result().body());
-				promise.complete(response);
-				logger.info("SUCCESS: " + replyHandler.result().body().toString());
+				logger.info("Response from web client verticle: " + replyHandler.result().body().toString());
+				JsonObject apiResp = (JsonObject) replyHandler.result().body();
+				if(apiResp.getBoolean("isSuccess")) {
+					JsonObject response = new JsonObject()
+							.put("isSuccess", Boolean.TRUE)
+							.put("response", apiResp.getJsonObject("response"));
+					promise.complete(response);
+				} else {
+					JsonObject response = new JsonObject()
+							.put("isSuccess", Boolean.FALSE)
+							.put("response", replyHandler.result().body());
+					promise.complete(response);
+				}						
 			} else {
 				promise.fail(replyHandler.cause());
-				logger.info("Fail: " + replyHandler.cause().getMessage());
+				logger.error("Call to remote API failed... Stacktrace: ", (Throwable) replyHandler.cause());
 			}
 		});
 		return promise.future();

@@ -60,7 +60,10 @@ public class WebClientVerticle extends AbstractVerticle {
 			}, resultHandler -> {
 				if(resultHandler.succeeded()) {
 					logger.info("EventBus Address: [{}] - sending successful response...", handler.address());
-					handler.reply(resultHandler.result());
+					JsonObject jsonObject = new JsonObject()
+							.put("isSuccess", Boolean.TRUE)
+							.put("response", resultHandler.result());
+					handler.reply(jsonObject);
 				}else {
 					logger.error("EventBus Address: [{}] - sending failure response...", handler.address());
 					JsonObject jsonObject = new JsonObject()
@@ -85,7 +88,6 @@ public class WebClientVerticle extends AbstractVerticle {
 						logger.info("Status Code {} | Response: {}", response.statusCode(), response.bodyAsString());
 						promise.complete(response.bodyAsJsonObject());
 					} else {
-						System.out.println("Something went wrong " + handler.cause().getMessage());
 						logger.error("Error calling remote endpoint, stacktrace: ", (Throwable) handler.cause());						
 						promise.fail(handler.cause());
 					}

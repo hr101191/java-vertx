@@ -68,7 +68,7 @@ public class HttpServerVerticle extends AbstractVerticle {
 							JsonObject jsonObject = (JsonObject) replyHandler.result().body();
 							if(jsonObject.getBoolean("isSuccess")) {
 								logger.info("Ending response... Route: [/api/greeting] | Success | Status Code: [{}]", jsonObject.getInteger("statusCode"));
-								routingContext.response().setChunked(true).setStatusCode(200).write(jsonObject.getJsonObject("response").encodePrettily()).end();
+								routingContext.response().setChunked(true).putHeader("content-type", "application/json").setStatusCode(200).write(jsonObject.getJsonObject("response").encodePrettily()).end();
 							} else {
 								logger.error("Ending response... Route: [/api/greeting] | Failed | Status Code: [{}] | Error Message: [{}]", jsonObject.getInteger("statusCode"), jsonObject.getString("errorMessage"));
 								routingContext.response().setStatusCode(jsonObject.getInteger("statusCode")).end();
