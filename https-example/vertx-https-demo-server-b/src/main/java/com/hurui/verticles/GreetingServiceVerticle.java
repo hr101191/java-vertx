@@ -74,7 +74,10 @@ public class GreetingServiceVerticle extends AbstractVerticle {
 		Promise<JsonObject> promise = Promise.promise();
 		eventBus.request("HTTP_GET", jsonObject, replyHandler -> {
 			if(replyHandler.succeeded()) {
-				promise.complete((JsonObject) replyHandler.result().body());
+				JsonObject response = new JsonObject()
+						.put("isSuccess", Boolean.TRUE)
+						.put("response", replyHandler.result().body());
+				promise.complete(response);
 				logger.info("SUCCESS: " + replyHandler.result().body().toString());
 			} else {
 				promise.fail(replyHandler.cause());

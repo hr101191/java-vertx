@@ -27,11 +27,11 @@ public class WebClientVerticle extends AbstractVerticle {
 				.setSsl(true)
 				.setTrustAll(false)
 				.setKeyStoreOptions(new JksOptions() //configure keystore
-						.setPath("server-a-keystore.jks") //points to src/resources if no qualified path is provided
+						.setPath("server-b-keystore.jks") //points to src/resources if no qualified path is provided
 						.setPassword("11111111")
 						)
 				.setTrustStoreOptions(new JksOptions() //configure truststore
-						.setPath("server-a-truststore.jks") //points to src/resources if no qualified path is provided
+						.setPath("server-b-truststore.jks") //points to src/resources if no qualified path is provided
 						.setPassword("11111111")
 						)
 				);
@@ -78,13 +78,14 @@ public class WebClientVerticle extends AbstractVerticle {
 		Promise<JsonObject> promise = Promise.promise();
 		try {
 			logger.info("Sending [HTTP.GET] request... Port: {} | HostName: {} | Path: {}", port, hostName, path);
-			webClient.get(port, hostName, path)		
+			webClient.get(port, hostName, path)	
 				.send(handler ->{
 					if(handler.succeeded()) {
 						HttpResponse<Buffer> response = handler.result();
 						logger.info("Status Code {} | Response: {}", response.statusCode(), response.bodyAsString());
 						promise.complete(response.bodyAsJsonObject());
 					} else {
+						System.out.println("Something went wrong " + handler.cause().getMessage());
 						logger.error("Error calling remote endpoint, stacktrace: ", (Throwable) handler.cause());						
 						promise.fail(handler.cause());
 					}

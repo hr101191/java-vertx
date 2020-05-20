@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 
+import com.hurui.verticles.GreetingServiceVerticle;
 import com.hurui.verticles.HttpServerVerticle;
 import com.hurui.verticles.WebClientVerticle;
 
@@ -34,12 +35,19 @@ public class VertxHttpsDemoServerAApplication {
 				logger.error("Error deploying WebClientVerticle, stacktrace:", completionHandler.cause());
 			}
 		});
+		vertx.deployVerticle(new GreetingServiceVerticle(), completionHandler -> {
+			if (completionHandler.succeeded()) {
+				logger.info("Deployed GreetingServiceVerticle successfully...");
+			} else {
+				logger.error("Error deploying GreetingServiceVerticle, stacktrace:", completionHandler.cause());
+			}
+		});
 		vertx.deployVerticle(new HttpServerVerticle(), completionHandler -> {
 			if (completionHandler.succeeded()) {
 				logger.info("Deployed HttpServerVerticle successfully...");
 			} else {
 				logger.error("Error deploying HttpServerVerticle, stacktrace:", completionHandler.cause());
 			}
-		});
+		});		
 	}
 }

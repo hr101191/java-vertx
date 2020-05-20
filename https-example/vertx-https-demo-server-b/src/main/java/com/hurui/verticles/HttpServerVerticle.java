@@ -27,18 +27,18 @@ public class HttpServerVerticle extends AbstractVerticle {
 		HttpServerOptions options = new HttpServerOptions()
 				.setSsl(true) //enable SSL
 				.setKeyStoreOptions(new JksOptions() //configure keystore
-					.setPath("server-a-keystore.jks") //points to src/resources if no qualified path is provided
+					.setPath("server-b-keystore.jks") //points to src/resources if no qualified path is provided
 					.setPassword("11111111")
 				)
 				.setTrustStoreOptions(new JksOptions() //configure truststore
-					.setPath("server-a-truststore.jks") //points to src/resources if no qualified path is provided
+					.setPath("server-b-truststore.jks") //points to src/resources if no qualified path is provided
 					.setPassword("11111111")
 				)
 				.addEnabledSecureTransportProtocol("TLSv1.3")
 				.addEnabledSecureTransportProtocol("TLSv1.2")
 				.addEnabledSecureTransportProtocol("TLSv1.1")
 				.addEnabledSecureTransportProtocol("TLSv1.0")
-				.setPort(8080);
+				.setPort(8081);
 		
 		eventBus = getVertx().eventBus();
 		
@@ -89,7 +89,7 @@ public class HttpServerVerticle extends AbstractVerticle {
 					});
 					break;
 				case "/api/hello": //simple endpoint for server A to call
-					routingContext.response().putHeader("content-type", "application/json").setStatusCode(200).end("{\"message\":\"hello from server a\"}");
+					routingContext.response().putHeader("content-type", "application/json").setStatusCode(200).end("{\"message\":\"hello from server B\"}");
 					break;
 				default:
 					logger.error("No valid handler has been set for path: {}", routingContext.currentRoute().getPath());
