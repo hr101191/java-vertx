@@ -180,6 +180,7 @@ Server B:
 2) Created a truststore which included server B's certificate to verify server B's identity when server B tries to establish TLS connection with server A.
 
 ## 4. Code Discussion
+Vertx WebClient:
 ```java
 public class WebClientVerticle extends AbstractVerticle {
 	
@@ -205,6 +206,7 @@ public class WebClientVerticle extends AbstractVerticle {
 }
 ```
 
+Vertx HttpServer:
 ```java
 public class HttpServerVerticle extends AbstractVerticle {
 
@@ -234,6 +236,7 @@ public class HttpServerVerticle extends AbstractVerticle {
 ```
 
 Other points to note:
+
 \* Even though project used SpringBoot, noticed that the AbstractVerticle classes are not marked with @Component? This is to ensure that the lifecycle of the Verticles are managed by Vertx instead. See code snippet below on how to deploy the verticles:
 ```java
 	//Use @EventListener to ensure that all the required Spring Beans are loaded before starting the Verticles
@@ -264,6 +267,21 @@ Other points to note:
 				logger.error("Error deploying HttpServerVerticle, stacktrace:", completionHandler.cause());
 			}
 		});		
+	}
+```
+
+\* Use @PreDestroy to dispose any Vertx resources
+```java
+	@PreDestroy
+	private void destroy() {
+		vertx.close(completionHandler -> {
+			if(completionHandler.succeeded()) {
+				logger.info("Disposed all Vertx managed resources successfully...");
+			}else {
+				logger.info("Error disposing Vertx managed resources, stacktrace: ", completionHandler.cause());
+			}
+		});
+		//Proceed to dispose Spring Managed Resources if required
 	}
 ```
 ## 5. Test
