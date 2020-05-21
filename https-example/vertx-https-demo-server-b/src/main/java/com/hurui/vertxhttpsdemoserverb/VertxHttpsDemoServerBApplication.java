@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.EventListener;
 
 import com.hurui.verticles.GreetingServiceVerticle;
@@ -19,10 +20,11 @@ import io.vertx.core.Vertx;
 public class VertxHttpsDemoServerBApplication {
 
 	private static final Logger logger = LoggerFactory.getLogger(new Object() { }.getClass().getEnclosingClass());
+	private static ApplicationContext applicationContext; 
 	private Vertx vertx;
 	
 	public static void main(String[] args) {
-		SpringApplication.run(VertxHttpsDemoServerBApplication.class, args);
+		applicationContext = SpringApplication.run(VertxHttpsDemoServerBApplication.class, args);
 	}
 	
 	//Use @EventListener to allow Spring to initialize all the required Beans before deploying the verticles
@@ -31,21 +33,21 @@ public class VertxHttpsDemoServerBApplication {
 		vertx = Vertx.vertx();
 		//IMPORTANT: do not autowire the verticles as the resources will be managed by spring instead
 		//Create a new instance manually and deploy with the created vertx instance here
-		vertx.deployVerticle(new WebClientVerticle(), completionHandler -> {
+		vertx.deployVerticle(new WebClientVerticle(applicationContext), completionHandler -> {
 			if (completionHandler.succeeded()) {
 				logger.info("Deployed WebClientVerticle successfully...");
 			} else {
 				logger.error("Error deploying WebClientVerticle, stacktrace:", completionHandler.cause());
 			}
 		});
-		vertx.deployVerticle(new GreetingServiceVerticle(), completionHandler -> {
+		vertx.deployVerticle(new GreetingServiceVerticle(applicationContext), completionHandler -> {
 			if (completionHandler.succeeded()) {
 				logger.info("Deployed GreetingServiceVerticle successfully...");
 			} else {
 				logger.error("Error deploying GreetingServiceVerticle, stacktrace:", completionHandler.cause());
 			}
 		});
-		vertx.deployVerticle(new HttpServerVerticle(), completionHandler -> {
+		vertx.deployVerticle(new HttpServerVerticle(applicationContext), completionHandler -> {
 			if (completionHandler.succeeded()) {
 				logger.info("Deployed HttpServerVerticle successfully...");
 			} else {

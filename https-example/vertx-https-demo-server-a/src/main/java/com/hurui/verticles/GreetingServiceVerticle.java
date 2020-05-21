@@ -2,6 +2,7 @@ package com.hurui.verticles;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
@@ -18,7 +19,13 @@ public class GreetingServiceVerticle extends AbstractVerticle {
 	private static final String GREETING_SERVICE_PATH = "/api/hello";
 	//Somehow passing doesn't work https://localhost:8080/api/hello
 	
+	private ApplicationContext applicationContext;
 	private EventBus eventBus;
+	
+	//Pass Spring ApplicationContext via ctor to allow access to Spring managed resources
+	public GreetingServiceVerticle(ApplicationContext applicationContext) {
+		this.applicationContext = applicationContext;
+	}
 	
 	@Override
 	public void start() {
