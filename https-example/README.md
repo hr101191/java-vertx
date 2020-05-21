@@ -180,5 +180,29 @@ Server B:
 2) Created a truststore which included server B's certificate to verify server B's identity when server B tries to establish TLS connection with server A.
 
 ## 4. Code Discussion
-
+```java
+public class WebClientVerticle extends AbstractVerticle {
+	
+	//Omitted
+	
+	@Override
+	public void start() {
+		webClient = WebClient.create(getVertx(), new WebClientOptions()
+				.setSsl(true)
+				.setTrustAll(false)
+				.setKeyStoreOptions(new JksOptions() //configure keystore
+						.setPath("server-b-keystore.jks") //points to src/resources if no qualified path is provided
+						.setPassword("11111111")
+						)
+				.setTrustStoreOptions(new JksOptions() //configure truststore
+						.setPath("server-b-truststore.jks") //points to src/resources if no qualified path is provided
+						.setPassword("11111111")
+						)
+				);
+				
+		//Omitted
+	}
+	//Omitted
+}
+```
 ## 5. Test
