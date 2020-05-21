@@ -187,7 +187,7 @@ public class WebClientVerticle extends AbstractVerticle {
 	
 	@Override
 	public void start() {
-		webClient = WebClient.create(getVertx(), new WebClientOptions()
+		webClient = WebClient.create(vertx, new WebClientOptions()
 				.setSsl(true)
 				.setTrustAll(false)
 				.setKeyStoreOptions(new JksOptions() //configure keystore
@@ -198,11 +198,72 @@ public class WebClientVerticle extends AbstractVerticle {
 						.setPath("server-b-truststore.jks") //points to src/resources if no qualified path is provided
 						.setPassword("11111111")
 						)
-				);
-				
+				);				
 		//Omitted
 	}
 	//Omitted
 }
+```
+
+```java
+public class HttpServerVerticle extends AbstractVerticle {
+
+	//Omitted
+	
+	@Override
+	public void start() {
+		HttpServerOptions options = new HttpServerOptions()
+				.setSsl(true) //enable SSL
+				.setKeyStoreOptions(new JksOptions() //configure keystore
+					.setPath("server-b-keystore.jks") //points to src/resources if no qualified path is provided
+					.setPassword("11111111")
+				)
+				.setTrustStoreOptions(new JksOptions() //configure truststore
+					.setPath("server-b-truststore.jks") //points to src/resources if no qualified path is provided
+					.setPassword("11111111")
+				)
+				.addEnabledSecureTransportProtocol("TLSv1.3")
+				.addEnabledSecureTransportProtocol("TLSv1.2")
+				.addEnabledSecureTransportProtocol("TLSv1.1")
+				.addEnabledSecureTransportProtocol("TLSv1.0")
+				.setPort(8081);
+		//Omitted
+	}
+	//Omitted
+}
+```
+
+Other points to note:
+\* Even though project used SpringBoot, noticed that the AbstractVerticle classes are not marked with @Component? This is to ensure that the lifecycle of the Verticles are managed by Vertx instead. See code snippet below on how to deploy the verticles:
+```java
+	//Use @EventListener to ensure that all the required Spring Beans are loaded before starting the Verticles
+	@EventListener
+	private void dostuff(ApplicationReadyEvent event) {
+		//1) Create an instance of Vertx
+		Vertx vertx = Vertx.vertx();
+		
+		//2) Deploy the verticles using this instance of Vertx
+		vertx.deployVerticle(new WebClientVerticle(), completionHandler -> {
+			if (completionHandler.succeeded()) {
+				logger.info("Deployed WebClientVerticle successfully...");
+			} else {
+				logger.error("Error deploying WebClientVerticle, stacktrace:", completionHandler.cause());
+			}
+		});
+		vertx.deployVerticle(new GreetingServiceVerticle(), completionHandler -> {
+			if (completionHandler.succeeded()) {
+				logger.info("Deployed GreetingServiceVerticle successfully...");
+			} else {
+				logger.error("Error deploying GreetingServiceVerticle, stacktrace:", completionHandler.cause());
+			}
+		});
+		vertx.deployVerticle(new HttpServerVerticle(), completionHandler -> {
+			if (completionHandler.succeeded()) {
+				logger.info("Deployed HttpServerVerticle successfully...");
+			} else {
+				logger.error("Error deploying HttpServerVerticle, stacktrace:", completionHandler.cause());
+			}
+		});		
+	}
 ```
 ## 5. Test

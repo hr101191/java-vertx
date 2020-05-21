@@ -23,7 +23,7 @@ public class WebClientVerticle extends AbstractVerticle {
 	@Override
 	public void start() {
 		//TODO: Externalize the configuration
-		webClient = WebClient.create(getVertx(), new WebClientOptions()
+		webClient = WebClient.create(vertx, new WebClientOptions()
 				.setSsl(true)
 				.setTrustAll(false)
 				.setKeyStoreOptions(new JksOptions() //configure keystore
