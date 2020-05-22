@@ -1,5 +1,7 @@
 package com.hurui.verticles;
 
+import java.sql.Timestamp;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -26,7 +28,7 @@ public class GreetingServiceVerticle extends AbstractVerticle {
 	public GreetingServiceVerticle(ApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
 	}
-
+	
 	@Override
 	public void start() {
 		eventBus = vertx.eventBus();
@@ -50,30 +52,17 @@ public class GreetingServiceVerticle extends AbstractVerticle {
 				logger.info("EventBus Address: [{}] - Enter Greeting Service Result Handler...", handler.address());
 				if(resultHandler.succeeded()) {
 					logger.info("EventBus Address: [{}] - result handler successful...", handler.address());
-					JsonObject result = (JsonObject) resultHandler.result();
-					if(result.getBoolean("isSuccess")) {
-						logger.info("EventBus Address: [{}] - Sending OK response from resultHandler...", handler.address());
-						JsonObject jsonObject = new JsonObject()
-								.put("isSuccess", Boolean.TRUE)
-								.put("statusCode", 200)
-								.put("response", result.getJsonObject("response"));
-						handler.reply(jsonObject);
-					} else {
-						logger.warn("EventBus Address: [{}] - Sending error response from resultHandler...", handler.address());
-						JsonObject jsonObject = new JsonObject()
-								.put("isSuccess", Boolean.FALSE)
-								.put("statusCode", 500)
-								.put("errorMessage", result.getString("errorMessage"));
-						handler.reply(jsonObject);
-					}
-					
+					handler.reply(resultHandler.result());				
 				} else {
-					logger.error("EventBus Address: [{}] - result handler failed... Stacktrace: [{}]", handler.address(), (Throwable) resultHandler.cause());
+					logger.error("EventBus Address: [{}] - result handler failed... Error Message: [{}]", handler.address(), resultHandler.cause().getMessage());
+					// you want to "reply" here instead of throwing an error. HttpServer eventBus will parse the response from this jsonObject
 					JsonObject jsonObject = new JsonObject()
-							.put("isSuccess", Boolean.FALSE)
 							.put("statusCode", 500)
-							.put("errorMessage", resultHandler.cause().getMessage());
-					handler.reply(jsonObject);
+							.put("responseBody", new JsonObject()
+									.put("timestamp", new Timestamp(System.currentTimeMillis()).getTime())
+									.put("statusCode", 500)
+									.put("errorMessage", resultHandler.cause().getMessage()));
+					handler.reply(jsonObject); //Service verticle should always give a successful response to HTTPS verticle
 				}
 			});
 		});
@@ -82,26 +71,34 @@ public class GreetingServiceVerticle extends AbstractVerticle {
 	private Future<JsonObject> handleGreetingFuture(JsonObject jsonObject){
 		Promise<JsonObject> promise = Promise.promise();
 		eventBus.request("HTTP_GET", jsonObject, replyHandler -> {
-			if(replyHandler.succeeded()) {
-				logger.info("Response from web client verticle: " + replyHandler.result().body().toString());
-				JsonObject apiResp = (JsonObject) replyHandler.result().body();
-				if(apiResp.getBoolean("isSuccess")) {
-					JsonObject response = new JsonObject()
-							.put("isSuccess", Boolean.TRUE)
-							.put("response", apiResp.getJsonObject("response"));
-					promise.complete(response);
+			vertx.executeBlocking(blockingCodeHandler -> {
+				try {
+					if(replyHandler.succeeded()) {
+						logger.info("Response from web client verticle: " + replyHandler.result().body().toString());
+						//TODO: apply business logic to process the response from remote API
+						blockingCodeHandler.complete((JsonObject) replyHandler.result().body());
+					}else {
+						logger.error("Error from web client verticle... Error Message: [{}]", replyHandler.cause().getMessage());						
+						blockingCodeHandler.fail(replyHandler.cause());
+					}
+				} catch(Exception ex) {
+					logger.error("handleGreetingFuture failed ... Stacktrace: ", (Throwable) replyHandler.cause());
+					blockingCodeHandler.fail(ex);
+				}	
+			}, resultHandler -> {
+				if (resultHandler.succeeded()) {
+					try {
+						promise.complete((JsonObject) resultHandler.result());
+					}catch (Exception ex) {
+						promise.fail(ex); // in case of casting error
+					}					
 				} else {
-					JsonObject response = new JsonObject()
-							.put("isSuccess", Boolean.FALSE)
-							.put("response", replyHandler.result().body());
-					promise.complete(response);
-				}						
-			} else {
-				promise.fail(replyHandler.cause());
-				logger.error("Call to remote API failed... Stacktrace: ", (Throwable) replyHandler.cause());
-			}
+					promise.fail(resultHandler.cause());
+				}
+			});
 		});
 		return promise.future();
 	}
+
 
 }

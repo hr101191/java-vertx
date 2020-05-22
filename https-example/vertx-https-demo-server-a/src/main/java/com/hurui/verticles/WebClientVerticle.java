@@ -18,6 +18,7 @@ import io.vertx.ext.web.client.WebClientOptions;
 public class WebClientVerticle extends AbstractVerticle {
 	
 	private static final Logger logger = LoggerFactory.getLogger(new Object() { }.getClass().getEnclosingClass());	
+	private static final Boolean IS_HTTPS = Boolean.TRUE;
 	private ApplicationContext applicationContext;
 	private EventBus eventBus;	
 	private WebClient webClient;
@@ -66,17 +67,10 @@ public class WebClientVerticle extends AbstractVerticle {
 			}, resultHandler -> {
 				if(resultHandler.succeeded()) {
 					logger.info("EventBus Address: [{}] - sending successful response...", handler.address());
-					JsonObject jsonObject = new JsonObject()
-							.put("isSuccess", Boolean.TRUE)
-							.put("response", resultHandler.result());
-					handler.reply(jsonObject);
+					handler.reply(resultHandler.result());
 				}else {
 					logger.error("EventBus Address: [{}] - sending failure response...", handler.address());
-					JsonObject jsonObject = new JsonObject()
-							.put("isSuccess", Boolean.FALSE)
-							.put("statusCode", 500)
-							.put("errorMessage", resultHandler.cause().getMessage());
-					handler.reply(jsonObject);					
+					handler.fail(500, resultHandler.cause().getMessage());
 				}
 			});
 		});
@@ -86,13 +80,17 @@ public class WebClientVerticle extends AbstractVerticle {
 	private Future<JsonObject> handleGetRequest(int port, String hostName, String path){
 		Promise<JsonObject> promise = Promise.promise();
 		try {
-			logger.info("Sending [HTTP.GET] request... Port: {} | HostName: {} | Path: {}", port, hostName, path);
+			logger.info("Sending [HTTP.GET] request... HTTPS: {} | Port: {} | HostName: {} | Path: {}", IS_HTTPS, port, hostName, path);
 			webClient.get(port, hostName, path)		
+				.ssl(IS_HTTPS)
 				.send(handler ->{
 					if(handler.succeeded()) {
 						HttpResponse<Buffer> response = handler.result();
-						logger.info("Status Code {} | Response: {}", response.statusCode(), response.bodyAsString());
-						promise.complete(response.bodyAsJsonObject());
+						logger.info("Response from remote endpoint - Status Code {} | Response: {}", response.statusCode(), response.bodyAsString());
+						JsonObject jsonObject = new JsonObject()
+								.put("statusCode", response.statusCode())
+								.put("responseBody", response.bodyAsJsonObject());
+						promise.complete(jsonObject);
 					} else {
 						logger.error("Error calling remote endpoint, stacktrace: ", (Throwable) handler.cause());						
 						promise.fail(handler.cause());
@@ -104,5 +102,5 @@ public class WebClientVerticle extends AbstractVerticle {
 		}
 		return promise.future();
 	}
-
+	
 }

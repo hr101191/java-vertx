@@ -70,17 +70,12 @@ public class HttpServerVerticle extends AbstractVerticle {
 					logger.info("Received request... Route: [/api/greeting]");	
 					eventBus.request("/api/greeting", null, replyHandler -> {
 						if(replyHandler.succeeded()) {
-							logger.info("Response... Route: [/api/greeting]");	
 							JsonObject jsonObject = (JsonObject) replyHandler.result().body();
-							if(jsonObject.getBoolean("isSuccess")) {
-								logger.info("Ending response... Route: [/api/greeting] | Success | Status Code: [{}]", jsonObject.getInteger("statusCode"));
-								routingContext.response().setChunked(true).putHeader("content-type", "application/json").setStatusCode(200).write(jsonObject.getJsonObject("response").encodePrettily()).end();
-							} else {
-								logger.error("Ending response... Route: [/api/greeting] | Failed | Status Code: [{}] | Error Message: [{}]", jsonObject.getInteger("statusCode"), jsonObject.getString("errorMessage"));
-								routingContext.response().setStatusCode(jsonObject.getInteger("statusCode")).end();
-							}							
+							logger.info("Ending response... Route: [/api/greeting] | Success | Status Code: {} | Response Body: {}", jsonObject.getInteger("statusCode"), jsonObject.getJsonObject("responseBody"));
+							routingContext.response().setChunked(true).putHeader("content-type", "application/json").setStatusCode(jsonObject.getInteger("statusCode")).write(jsonObject.getJsonObject("responseBody").encodePrettily()).end();
 						} else {
-							logger.error("Error... Route: [/api/greeting] | stacktrace: ", replyHandler.cause());								
+							logger.error("Error... Route: [/api/greeting] | stacktrace: ", replyHandler.cause());	
+							//TODO: Create default jsonResponse for INTERNAL SERVER ERROR
 							routingContext.response().setStatusCode(500).end();
 						}
 					});
@@ -104,6 +99,7 @@ public class HttpServerVerticle extends AbstractVerticle {
 			}
 		} catch(Exception ex) {
 			logger.error("Get Handler failed! Stacktrace: ", ex);
+			routingContext.response().setStatusCode(500).end();
 		}	
 	}
 }
