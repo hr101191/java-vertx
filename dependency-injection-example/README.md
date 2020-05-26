@@ -17,7 +17,7 @@ framework itself or some external messaging system, for example [ActiveMQ](http:
 That pretty much describes what Vert.x does, each Verticle (actor) is responsible for a set of pre-defined functions, and communication is coordinated via the Vert.x EventBus exclusively.
 
 As quoted from the [Vert.x](https://vertx.io/docs/vertx-core/java/): "Vert.x does not force you to create your applications in this way if you don’t want to.." What if we absolutely want to use a dependency injection library with Vert.x? 
-The [VerticleFactory](https://vertx.io/docs/apidocs/io/vertx/core/spi/VerticleFactory.html) interface allows you to hook up the dependency injection library of choice. The benefit?
+The [VerticleFactory](https://vertx.io/docs/apidocs/io/vertx/core/spi/VerticleFactory.html) interface allows you to hook up the dependency injection library of choice.
 
 ## The Solution?
 Vertx has the interface [VerticleFactory](https://vertx.io/docs/apidocs/io/vertx/core/spi/VerticleFactory.html) which you can override the createVerticle(String verticleName, ClassLoader classLoader) method. This allows your favourite 
