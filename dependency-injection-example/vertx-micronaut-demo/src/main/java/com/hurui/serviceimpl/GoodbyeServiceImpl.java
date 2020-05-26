@@ -8,7 +8,7 @@ import io.micronaut.context.annotation.Prototype;
 public class GoodbyeServiceImpl implements GoodbyeService {
 
 	@Override
-	public String SayGoodbye() {
+	public String sayGoodbye() {
 		return "Goodbye";
 	}
 

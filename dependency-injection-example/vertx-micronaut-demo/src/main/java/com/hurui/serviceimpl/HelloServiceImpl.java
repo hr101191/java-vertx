@@ -8,7 +8,7 @@ import io.micronaut.context.annotation.Prototype;
 public class HelloServiceImpl implements HelloService {
 
 	@Override
-	public String SayHello() {
+	public String sayHello() {
 		return "Hello!";
 	}
 

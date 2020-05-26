@@ -27,12 +27,12 @@ public class GreetingServiceImpl implements GreetingService {
 	}
 	
 	@Override
-	public String Hello() {
-		return helloService.SayHello();
+	public String hello() {
+		return helloService.sayHello();
 	}
 
 	@Override
-	public String Goodbye() {
-		return goodbyeService.SayGoodbye();
+	public String goodbye() {
+		return goodbyeService.sayGoodbye();
 	}
 }

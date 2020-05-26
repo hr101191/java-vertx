@@ -4,8 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Context;
-import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServer;
@@ -19,11 +17,6 @@ public class HttpServerVerticle extends AbstractVerticle {
 	
 	private static final Logger logger = LoggerFactory.getLogger(new Object() { }.getClass().getEnclosingClass());
 	private EventBus eventBus;
-	
-    @Override
-    public void init(Vertx vertx, Context context) {
-        super.init(vertx, context);
-    }
 	
 	@Override
 	public void start() {

@@ -3,6 +3,7 @@ package com.hurui.vertxmicronautdemo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hurui.verticles.GreetingServiceVerticle;
 import com.hurui.verticles.HttpServerVerticle;
 import com.hurui.verticles.MicronautVerticleFactory;
 
@@ -34,7 +35,7 @@ public class VertxMicronautDemoApplication {
 		// as well as to enable Dependency injection in the verticle classes
 		//2) Create vertx instance
 		// *Worker Pool is enabled by default and size is 20. 
-		Vertx vertx = Vertx.vertx(new VertxOptions().setWorkerPoolSize(4)); //Set the number of worker threads to be the same as the number of verticle instances to be deployed 
+		Vertx vertx = Vertx.vertx(new VertxOptions().setWorkerPoolSize(5)); //Set the number of worker threads to be the same as the number of verticle instances to be deployed 
 		
 		//3) Create Instance of verticle factory (To override verticle deployment)
 		// We want Guice to create the verticle instances
@@ -44,11 +45,19 @@ public class VertxMicronautDemoApplication {
 		vertx.registerVerticleFactory(verticleFactory);
 
 		//5) Deploy the verticle (Just an example, we want 4 instances)
-		vertx.deployVerticle(verticleFactory.prefix() + ":" + HttpServerVerticle.class.getName(), new DeploymentOptions().setWorker(true).setInstances(4), completionHandler -> {
+		vertx.deployVerticle(verticleFactory.prefix() + ":" + HttpServerVerticle.class.getName(), new DeploymentOptions(), completionHandler -> {
 			if (completionHandler.succeeded()) {
 				logger.info("[{}] deployed successfully... ", HttpServerVerticle.class.getName());
 			} else {
 				logger.error("Failed to deploy [{}]... Stacktrace: ", HttpServerVerticle.class.getName(), completionHandler.cause());
+			}
+		});
+		
+		vertx.deployVerticle(verticleFactory.prefix() + ":" + GreetingServiceVerticle.class.getName(), new DeploymentOptions().setWorker(true).setInstances(4), completionHandler -> {
+			if (completionHandler.succeeded()) {
+				logger.info("[{}] deployed successfully... ", GreetingServiceVerticle.class.getName());
+			} else {
+				logger.error("Failed to deploy [{}]... Stacktrace: ", GreetingServiceVerticle.class.getName(), completionHandler.cause());
 			}
 		});
 	}
