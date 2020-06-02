@@ -84,9 +84,12 @@
 										<Main-Class>${main.class}</Main-Class>
 									</manifestEntries>
 								</transformer>
-								<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+								<!-- this is not required since we are starting our verticles from the embedded Vert.x in our main method -->
+								<!-- refer to link below if you wish to run verticles without embedding Vert.x -->
+								<!-- https://github.com/vert-x3/vertx-examples/tree/master/maven-verticles/maven-verticle -->
+								<!--<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
 									<resource>META-INF/services/io.vertx.core.spi.VerticleFactory</resource>
-								</transformer>
+								</transformer>-->
 							</transformers>
 							<artifactSet>
 							</artifactSet>
