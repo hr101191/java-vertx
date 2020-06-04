@@ -2,7 +2,8 @@ package com.hurui.verticles;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
@@ -15,18 +16,15 @@ import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
 
+@Component
+@Scope("prototype") //Prototype scope is needed if you want to deploy multiple instances of this verticle
 public class WebClientVerticle extends AbstractVerticle {
 	
 	private static final Logger logger = LoggerFactory.getLogger(new Object() { }.getClass().getEnclosingClass());	
 	private static final Boolean IS_HTTPS = Boolean.TRUE;
-	private ApplicationContext applicationContext;
 	private EventBus eventBus;	
 	private WebClient webClient;
-	
-	public WebClientVerticle(ApplicationContext applicationContext) {
-		this.applicationContext = applicationContext;
-	}
-	
+
 	@Override
 	public void start() {
 		//TODO: Externalize the configuration

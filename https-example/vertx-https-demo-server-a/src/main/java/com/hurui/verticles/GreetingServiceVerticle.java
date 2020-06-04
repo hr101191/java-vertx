@@ -1,11 +1,11 @@
 package com.hurui.verticles;
 
-import java.io.ObjectOutputStream.PutField;
 import java.sql.Timestamp;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
@@ -13,6 +13,8 @@ import io.vertx.core.Promise;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 
+@Component
+@Scope("prototype") //Prototype scope is needed if you want to deploy multiple instances of this verticle
 public class GreetingServiceVerticle extends AbstractVerticle {
 	
 	private static final Logger logger = LoggerFactory.getLogger(new Object() { }.getClass().getEnclosingClass());
@@ -22,13 +24,7 @@ public class GreetingServiceVerticle extends AbstractVerticle {
 	private static final String GREETING_SERVICE_PATH = "/api/hello";
 	//Somehow passing doesn't work https://localhost:8080/api/hello
 	
-	private ApplicationContext applicationContext;
 	private EventBus eventBus;
-	
-	//Pass Spring ApplicationContext via ctor to allow access to Spring managed resources
-	public GreetingServiceVerticle(ApplicationContext applicationContext) {
-		this.applicationContext = applicationContext;
-	}
 	
 	@Override
 	public void start() {

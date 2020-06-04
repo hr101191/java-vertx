@@ -65,14 +65,14 @@
 					<configuration>
 						<source>1.8</source>
 						<target>1.8</target>
-							<annotationProcessorPaths>
-								<path>
-									<!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
-									<groupId>io.micronaut</groupId>
-									<artifactId>micronaut-inject-java</artifactId>
-									<version>${micronaut.version}</version>
-								</path>
-							</annotationProcessorPaths>
+						<annotationProcessorPaths>
+							<path>
+								<!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
+								<groupId>io.micronaut</groupId>
+								<artifactId>micronaut-inject-java</artifactId>
+								<version>${micronaut.version}</version>
+							</path>
+						</annotationProcessorPaths>
 					</configuration>			
 				</plugin>
 			</plugins>
