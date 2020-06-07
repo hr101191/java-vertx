@@ -29,7 +29,7 @@ public class MainVerticle extends AbstractVerticle {
 	
 	@Override
 	public void start() {
-		logger.info("Initializing Main Verticle");		
+		logger.info("Initializing Main Verticle");	
 
 		VertxOptions vertxOptions = new VertxOptions();
 		Future<ClusterManager> clusterManagerFuture = buildClusterManager();

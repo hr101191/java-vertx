@@ -22,6 +22,9 @@ public class MainVerticle extends AbstractVerticle {
 	public void start() {
 		logger.info("Initializing Main Verticle");
 		
+		//get the initial config
+		logger.info("Context: " + vertx.getOrCreateContext().config());
+		
 		VertxOptions vertxOptions = new VertxOptions();
 		Future<ClusterManager> clusterManagerFuture = buildClusterManager();
 		clusterManagerFuture.onComplete(handler -> {
