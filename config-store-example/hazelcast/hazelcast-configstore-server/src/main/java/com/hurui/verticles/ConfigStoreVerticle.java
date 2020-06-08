@@ -7,9 +7,7 @@ import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
 import io.vertx.config.ConfigStoreOptions;
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Handler;
 import io.vertx.core.eventbus.EventBus;
-import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -30,12 +28,13 @@ public class ConfigStoreVerticle extends AbstractVerticle {
 			    				.add(new JsonObject().put("pattern", "*json"))
 			    				));
 	
-		ConfigRetrieverOptions options = new ConfigRetrieverOptions()
+		ConfigRetrieverOptions configRetrieverOptions = new ConfigRetrieverOptions()
 				//.setScanPeriod(2000)
 				.addStore(directoryConfigStoreOptions);
 		
-		ConfigRetriever configRetriever = ConfigRetriever.create(getVertx(), options);
-		// Fetch the config from the eventbus config store on startup
+		ConfigRetriever configRetriever = ConfigRetriever.create(vertx, configRetrieverOptions);
+		
+		// Fetch the config from the directory config store on startup
 		configRetriever.getConfig(asyncResult -> {
 			if(asyncResult.succeeded()) {
 				logger.info("Initialized json config: " + asyncResult.result());
@@ -45,7 +44,6 @@ public class ConfigStoreVerticle extends AbstractVerticle {
 			}
 		});
 		
-
 		configRetriever.listen(listener -> {
 			logger.info("Existing config: " + listener.getPreviousConfiguration());
 			logger.info("New Config: " + listener.getNewConfiguration());

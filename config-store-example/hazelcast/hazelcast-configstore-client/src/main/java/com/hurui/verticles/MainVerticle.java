@@ -23,13 +23,44 @@ public class MainVerticle extends AbstractVerticle {
 	
 	private static final Logger logger = LoggerFactory.getLogger(new Object() { }.getClass().getEnclosingClass());
 	
-	private JsonObject jsonConfig;
-	private ConfigRetriever retriever;
-	private String demoVerticleDeploymentId;
+	private JsonObject localConfig = new JsonObject();
+	private JsonObject jsonConfig = new JsonObject();
+	private String demoVerticleDeploymentId = null;
 	
 	@Override
 	public void start() {
 		logger.info("Initializing Main Verticle");	
+		
+		//get the initial config
+		if(vertx.getOrCreateContext().config().isEmpty()) {
+			//build config store from src/main/resources and read the default config
+			logger.info("No --conf overload detected from CLI, loading default-config.json from src/main/resoruces");
+			ConfigStoreOptions fileConfigStoreOptions = new ConfigStoreOptions()
+					.setType("file")
+					.setOptional(true)
+					.setConfig(new JsonObject()
+							.put("path", "src/main/resources/default-config.json"));
+			
+			ConfigRetrieverOptions configRetrieverOptions = new ConfigRetrieverOptions()
+					.setScanPeriod(2000000)
+					.addStore(fileConfigStoreOptions);
+			
+			ConfigRetriever configRetriever = ConfigRetriever.create(vertx, configRetrieverOptions);
+			
+			configRetriever.getConfig(completionHandler -> {
+				if(completionHandler.succeeded()) {
+					localConfig = completionHandler.result(); //Do something with the default config if required
+					logger.info("Default config loaded successfully: " + localConfig);
+				} else {
+					logger.error("Failed to read default-config.json from src/main/resoruces, stacktrace: ", completionHandler.cause());
+					logger.warn("Empty JsonObject used, some components may not load properly!");
+				}
+			});
+		} else {
+			//react to the --conf overload from command line and set the config based on the overload path
+			localConfig = vertx.getOrCreateContext().config(); //Note that no error message will be thrown here, please ensure input is correct!!
+			logger.info("Initial configuration from external context: " + localConfig);
+		}	
 
 		VertxOptions vertxOptions = new VertxOptions();
 		Future<ClusterManager> clusterManagerFuture = buildClusterManager();
@@ -82,8 +113,17 @@ public class MainVerticle extends AbstractVerticle {
 					logger.info("Previous json config from event-bus: " + listener.getPreviousConfiguration());
 					logger.info("New json config from event-bus: " + listener.getNewConfiguration());
 					jsonConfig = listener.getNewConfiguration();
-					//TODO: redeploy the verticles to reflect the new config changes
-					logger.info("TODO: redeploy the verticle");
+					
+					Future<String> redeployFuture = undeployVerticle(demoVerticleDeploymentId)
+							.compose(mapper -> deployVerticle(new DemoVerticle(), new DeploymentOptions().setConfig(jsonConfig)));
+					redeployFuture.onComplete(handler -> {
+						if(handler.succeeded()) {
+							logger.info("Successfully redeployed Demo Verticle");
+							demoVerticleDeploymentId = handler.result(); //update the deploymentID
+						} else {
+							logger.error("Failed to undeploy Demo Verticle, stackTrace: ", handler.cause());
+						}
+					});
 				});
 
 			} else {
@@ -121,7 +161,7 @@ public class MainVerticle extends AbstractVerticle {
 		return promise.future();
 	}
 	
-	private Future<String> deployVerticle(Vertx vertx, Verticle verticle, DeploymentOptions deploymentOptions) {
+	private Future<String> deployVerticle(Verticle verticle, DeploymentOptions deploymentOptions) {
 		Promise<String> promise = Promise.promise();
 		vertx.deployVerticle(verticle, deploymentOptions, completionHandler -> {
 			if(completionHandler.succeeded()) {
@@ -133,7 +173,7 @@ public class MainVerticle extends AbstractVerticle {
 		return promise.future();
 	}
 	
-	private Future<Void> undeployVerticle(Vertx vertx, String deploymentId) {
+	private Future<Void> undeployVerticle(String deploymentId) {
 		Promise<Void> promise = Promise.promise();
 		vertx.undeploy(deploymentId, completionHandler -> {
 			if(completionHandler.succeeded()) {
@@ -142,11 +182,6 @@ public class MainVerticle extends AbstractVerticle {
 				promise.fail(completionHandler.cause());
 			}
 		});
-		return promise.future();
-	}
-	
-	private Future<Void> configChangeEvent() {
-		Promise<Void> promise = Promise.promise();
 		return promise.future();
 	}
 }

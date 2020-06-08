@@ -5,25 +5,58 @@ import org.slf4j.LoggerFactory;
 
 import com.hazelcast.config.Config;
 
+import io.vertx.config.ConfigRetriever;
+import io.vertx.config.ConfigRetrieverOptions;
+import io.vertx.config.ConfigStoreOptions;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.spi.cluster.ClusterManager;
 import io.vertx.spi.cluster.hazelcast.HazelcastClusterManager;
 
 public class MainVerticle extends AbstractVerticle {
 	
 	private static final Logger logger = LoggerFactory.getLogger(new Object() { }.getClass().getEnclosingClass());
+	private JsonObject localConfig = new JsonObject();
 	
 	@Override
 	public void start() {
 		logger.info("Initializing Main Verticle");
 		
 		//get the initial config
-		logger.info("Context: " + vertx.getOrCreateContext().config());
+		if(vertx.getOrCreateContext().config().isEmpty()) {
+			//build config store from src/main/resources and read the default config
+			logger.info("No --conf overload detected from CLI, loading default-config.json from src/main/resoruces");
+			ConfigStoreOptions fileConfigStoreOptions = new ConfigStoreOptions()
+					.setType("file")
+					.setOptional(true)
+					.setConfig(new JsonObject()
+							.put("path", "src/main/resources/default-config.json"));
+			
+			ConfigRetrieverOptions configRetrieverOptions = new ConfigRetrieverOptions()
+					.setScanPeriod(2000000)
+					.addStore(fileConfigStoreOptions);
+			
+			ConfigRetriever configRetriever = ConfigRetriever.create(vertx, configRetrieverOptions);
+			
+			configRetriever.getConfig(completionHandler -> {
+				if(completionHandler.succeeded()) {
+					localConfig = completionHandler.result(); //Do something with the default config if required
+					logger.info("Default config loaded successfully: " + localConfig);
+				} else {
+					logger.error("Failed to read default-config.json from src/main/resoruces, stacktrace: ", completionHandler.cause());
+					logger.warn("Empty JsonObject used, some components may not load properly!");
+				}
+			});
+		} else {
+			//react to the --conf overload from command line and set the config based on the overload path
+			localConfig = vertx.getOrCreateContext().config(); //Note that no error message will be thrown here, please ensure input is correct!!
+			logger.info("Initial configuration from external context: " + localConfig);
+		}		
 		
 		VertxOptions vertxOptions = new VertxOptions();
 		Future<ClusterManager> clusterManagerFuture = buildClusterManager();
@@ -45,7 +78,7 @@ public class MainVerticle extends AbstractVerticle {
 					if(completionHandler.succeeded()) {
 						logger.info("Deployed verticle successfully...");
 					} else {
-						logger.error("Failed tp deploy verticle ... stacktrace: ", completionHandler.cause());
+						logger.error("Failed to deploy verticle ... stacktrace: ", completionHandler.cause());
 					}
 				});
 			} else {
