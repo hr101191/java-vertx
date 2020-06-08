@@ -140,12 +140,16 @@ public class MainVerticle extends AbstractVerticle {
 		Promise<ClusterManager> promise = Promise.promise();
 		vertx.<ClusterManager>executeBlocking(blockingCodeHandler -> {
 			try {
+				/*
+				 * Configure the hazelcast cluster manager programmatically
+				 * TODO: you may want to read all the values from the default-config.json instead
+				 */
 				Config hazelcastConfig = new Config();
 				hazelcastConfig.getNetworkConfig().getJoin().getTcpIpConfig().addMember("localhost").setEnabled(true);
 				hazelcastConfig.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
 				hazelcastConfig.getNetworkConfig().setPort(8888).setPortAutoIncrement(true);
 				//ClusterManager clusterManager = new HazelcastClusterManager(hazelcastConfig);
-				ClusterManager clusterManager = new HazelcastClusterManager();
+				ClusterManager clusterManager = new HazelcastClusterManager(); //using a default cluster manager in this example
 				promise.complete(clusterManager);
 			} catch(Exception ex) {
 				promise.fail(ex);
