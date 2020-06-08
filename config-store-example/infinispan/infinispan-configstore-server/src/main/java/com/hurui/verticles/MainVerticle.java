@@ -7,6 +7,7 @@ import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
 import io.vertx.config.ConfigStoreOptions;
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
@@ -69,7 +70,19 @@ public class MainVerticle extends AbstractVerticle {
 		
 		Vertx.clusteredVertx(vertxOptions, resultHandler -> {
 			if(resultHandler.succeeded()) {
-				logger.info("Obtained an instance of clustered Vertx successfully");
+				logger.info("Obtained an instance of clustered Vertx successfully");				
+				//Ensure that you use the clustered Vertx instance to deploy the ConfigStore Verticle so that any config change will be published to subscribing nodes
+				resultHandler.result().deployVerticle(new ConfigStoreVerticle(), new DeploymentOptions(), completionHandler -> {
+					if(completionHandler.succeeded()) {
+						logger.info("Deployed verticle successfully...");
+					} else {
+						logger.error("Failed to deploy verticle ... stacktrace: ", completionHandler.cause());
+					}
+				});
+			} else {
+				logger.error("Failed to obtained an instance of clustered Vertx, stacktrace: " , resultHandler.cause());
+				logger.warn("Program will terminate now! Please check the cluster configurations...");
+				System.exit(-1);
 			}
 		});
 	}
