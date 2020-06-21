@@ -51,7 +51,10 @@ public class MainVerticle extends AbstractVerticle {
 						.setConfig(new JsonObject()
 						.put("path", "src/main/resources/application-local-config.json"));
 				}
-			} 	
+			} else {
+				// Parse command line parameter as a resource
+				localConfig = commandLineConfig;
+			}
 		}
 		
 		ConfigRetrieverOptions configRetrieverOptions = new ConfigRetrieverOptions()
