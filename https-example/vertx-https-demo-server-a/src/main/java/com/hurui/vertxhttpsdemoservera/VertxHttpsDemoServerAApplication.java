@@ -2,14 +2,10 @@ package com.hurui.vertxhttpsdemoservera;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.GenericApplicationContext;
-
 import com.hurui.verticles.GreetingServiceVerticle;
 import com.hurui.verticles.HttpServerVerticle;
 import com.hurui.verticles.SpringVerticleFactory;
