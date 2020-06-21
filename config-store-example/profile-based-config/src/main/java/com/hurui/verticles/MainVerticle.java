@@ -17,7 +17,7 @@ public class MainVerticle extends AbstractVerticle {
 	
 	@Override
 	public void start() {
-		ConfigStoreOptions fileConfigStoreOptions = new ConfigStoreOptions();
+		ConfigStoreOptions configStoreOptions = new ConfigStoreOptions();
 		
 		/* (non-Javadoc)
 		 * Check if there is -conf overload passed via command line.
@@ -25,7 +25,7 @@ public class MainVerticle extends AbstractVerticle {
 		if(vertx.getOrCreateContext().config().isEmpty()) {
 			//load the default config for local env
 			logger.warn("-conf parameter is not passed via command line! Loading application-local-config from classpath...");	
-			fileConfigStoreOptions.setType("file")
+			configStoreOptions.setType("file")
 				.setConfig(new JsonObject()
 				.put("path", "src/main/resources/application-local-config.json"));
 		} else {
@@ -37,29 +37,31 @@ public class MainVerticle extends AbstractVerticle {
 				String profile = commandLineConfig.getString("activeProfile");
 				if (profile.equalsIgnoreCase("prod")) {
 					logger.info("Active profile: [{}]", profile);	
-					fileConfigStoreOptions.setType("file")
+					configStoreOptions.setType("file")
 						.setConfig(new JsonObject()
 						.put("path", "src/main/resources/application-prod-config.json"));
 				} else if (profile.equalsIgnoreCase("uat")) {
 					logger.info("Active profile: [{}]", profile);
-					fileConfigStoreOptions.setType("file")
+					configStoreOptions.setType("file")
 						.setConfig(new JsonObject()
 						.put("path", "src/main/resources/application-uat-config.json"));
 				} else {
 					logger.warn("Invalid profile: [{}] Loading application-local-config from classpath...", profile);
-					fileConfigStoreOptions.setType("file")
+					configStoreOptions.setType("file")
 						.setConfig(new JsonObject()
 						.put("path", "src/main/resources/application-local-config.json"));
 				}
 			} else {
 				// Parse command line parameter as a resource
-				localConfig = commandLineConfig;
+				logger.info("Loading command line -conf parameter as resource... Command line Config: {}", commandLineConfig);
+				configStoreOptions.setType("json")
+					.setConfig(commandLineConfig);
 			}
 		}
 		
 		ConfigRetrieverOptions configRetrieverOptions = new ConfigRetrieverOptions()
 				.setScanPeriod(2000000)
-				.addStore(fileConfigStoreOptions);
+				.addStore(configStoreOptions);
 		
 		ConfigRetriever configRetriever = ConfigRetriever.create(vertx, configRetrieverOptions);
 		
