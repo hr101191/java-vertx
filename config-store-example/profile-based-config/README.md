@@ -3,26 +3,42 @@
 ## 1. Description
 In this demo, we are replicating the look and feel of the Springboot profile based configuration with Vert.x shell
 
-Both servers will host the same service /api/greeting, When invoked, it will make a https call to the other server on the same endpoint
-
 ## 2. Command Line
 
-*Only -conf
+*Only -conf parameter is discussed here. 
 
 Program Arguments:
 ```
 -conf "{\"\activeProfile" : \"prod\"}"
 ```
 
-Program Arguments (running as a fat-jar):
+Get json config from command line:
+```java
+public class MainVerticle extends AbstractVerticle {
+	
+	@Override
+	public void start() {
+		JsonObject commandLineConfig = vertx.getOrCreateContext().config();
+		//Implement custom logic based on value from json
+	}
+}
 ```
-```
-
-Program Arguments (running as a fat-jar):
-```
-```
-
 ## 3. Code Discussion
+
+(1) Check if -conf parameter is passed from command line. Load default config from classpath is -conf is not passed:
+```java
+if(vertx.getOrCreateContext().config().isEmpty()) {
+	logger.warn("-conf parameter is not passed via command line! Loading application-local-config from classpath...");	
+	configStoreOptions.setType("file")
+		.setConfig(new JsonObject()
+		.put("path", "src/main/resources/application-local-config.json"));
+}
+```
+
+(2) Implement custom logic to load 
+```java
+```
+
 Full Code Snippet:
 ```java
 public class MainVerticle extends AbstractVerticle {
