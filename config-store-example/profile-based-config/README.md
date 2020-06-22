@@ -7,9 +7,9 @@ In this demo, we are replicating the look and feel of the Springboot profile bas
 
 *Only -conf parameter is discussed here. 
 
-Program Arguments:
+Program Arguments (use \ to escape inner double quotation):
 ```
--conf "{\"\activeProfile" : \"prod\"}"
+-conf "{\"activeProfile" : \"prod\"}"
 ```
 
 Get json config from command line:
@@ -69,9 +69,9 @@ if(commandLineConfig.containsKey("activeProfile")) {
 You may also pass in additional parameter(s) in the json string from command line as required by your business logic:
 
 Example:
-Program Arguments:
+Program Arguments (use \ to escape inner double quotation):
 ```
--conf "{\"\activeProfile" : \"prod\", \"instanceRef\" : 1}"
+-conf "{\"activeProfile" : \"prod\", \"instanceRef\" : 1}"
 ```
 
 Get json config from command line:
