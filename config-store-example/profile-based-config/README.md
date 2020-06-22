@@ -23,28 +23,51 @@ Program Arguments (running as a fat-jar):
 ```
 
 ## 3. Code Discussion
-Vertx WebClient:
+Full Code Snippet:
 ```java
-public class WebClientVerticle extends AbstractVerticle {
+public class MainVerticle extends AbstractVerticle {
 	
-	//Omitted
+	private static final Logger logger = LoggerFactory.getLogger(new Object() { }.getClass().getEnclosingClass());
+	private JsonObject localConfig = new JsonObject();
 	
 	@Override
 	public void start() {
-		webClient = WebClient.create(vertx, new WebClientOptions()
-				.setSsl(true)
-				.setTrustAll(false)
-				.setKeyStoreOptions(new JksOptions() //configure keystore
-						.setPath("server-b-keystore.jks") //points to src/resources if no qualified path is provided
-						.setPassword("11111111")
-						)
-				.setTrustStoreOptions(new JksOptions() //configure truststore
-						.setPath("server-b-truststore.jks") //points to src/resources if no qualified path is provided
-						.setPassword("11111111")
-						)
-				);				
-		//Omitted
+		ConfigStoreOptions configStoreOptions = new ConfigStoreOptions();
+		
+		if(vertx.getOrCreateContext().config().isEmpty()) {
+			logger.warn("-conf parameter is not passed via command line! Loading application-local-config from classpath...");	
+			configStoreOptions.setType("file")
+				.setConfig(new JsonObject()
+				.put("path", "src/main/resources/application-local-config.json"));
+		} else {
+			JsonObject commandLineConfig = vertx.getOrCreateContext().config();
+			
+			if(commandLineConfig.containsKey("activeProfile")) {
+				String profile = commandLineConfig.getString("activeProfile");
+				if (profile.equalsIgnoreCase("prod")) {
+					logger.info("Active profile: [{}]", profile);	
+					configStoreOptions.setType("file")
+						.setConfig(new JsonObject()
+						.put("path", "src/main/resources/application-prod-config.json"));
+				} else if (profile.equalsIgnoreCase("uat")) {
+					logger.info("Active profile: [{}]", profile);
+					configStoreOptions.setType("file")
+						.setConfig(new JsonObject()
+						.put("path", "src/main/resources/application-uat-config.json"));
+				} else {
+					logger.warn("Invalid profile: [{}] Loading application-local-config from classpath...", profile);
+					configStoreOptions.setType("file")
+						.setConfig(new JsonObject()
+						.put("path", "src/main/resources/application-local-config.json"));
+				}
+			} else {
+				logger.info("Loading command line -conf parameter as resource... Command line Config: {}", commandLineConfig);
+				configStoreOptions.setType("json")
+					.setConfig(commandLineConfig);
+			}
+		}
+		
+		//Omitted other business logic
 	}
-	//Omitted
 }
 ```
