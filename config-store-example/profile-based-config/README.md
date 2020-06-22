@@ -9,7 +9,7 @@ In this demo, we are replicating the look and feel of the Springboot profile bas
 
 Program Arguments (use \ to escape inner double quotation):
 ```
--conf "{\"activeProfile" : \"prod\"}"
+-conf "{\"activeProfile\" : \"prod\"}"
 ```
 
 Get json config from command line:
@@ -71,7 +71,7 @@ You may also pass in additional parameter(s) in the json string from command lin
 Example:
 Program Arguments (use \ to escape inner double quotation):
 ```
--conf "{\"activeProfile" : \"prod\", \"instanceRef\" : 1}"
+-conf "{\"activeProfile\" : \"prod\", \"instanceRef\" : 1}"
 ```
 
 Get json config from command line:
