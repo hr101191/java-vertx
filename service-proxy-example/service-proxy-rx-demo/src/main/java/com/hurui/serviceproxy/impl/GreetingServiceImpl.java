@@ -19,11 +19,13 @@ public class GreetingServiceImpl implements GreetingService {
 	public GreetingService hello(Handler<AsyncResult<JsonObject>> resultHandler) {
 		generateHelloMessage()
 			.doOnSubscribe(onSubscribe -> {
-				logger.info("");
+				logger.info("In GreetingService concrete implementation");
 			})
 			.subscribe(onSuccess -> {
+				logger.info("Method executed successfully, returning result...");
 				resultHandler.handle(Future.succeededFuture(onSuccess));
 			}, onError -> {
+				logger.warn("Method executed successfully, returning throwable...");
 				resultHandler.handle(Future.failedFuture(onError));
 			});
 		return this;
@@ -33,11 +35,13 @@ public class GreetingServiceImpl implements GreetingService {
 	public GreetingService goodbye(Handler<AsyncResult<JsonObject>> resultHandler) {
 		generateGoodbyeMessage()
 			.doOnSubscribe(onSubscribe -> {
-				logger.info("");
+				logger.info("In GreetingService concrete implementation");
 			})
 			.subscribe(onSuccess -> {
+				logger.info("Method executed successfully, returning result...");
 				resultHandler.handle(Future.succeededFuture(onSuccess));
 			}, onError -> {
+				logger.warn("Method executed successfully, returning throwable...");
 				resultHandler.handle(Future.failedFuture(onError));
 			});
 		return this;

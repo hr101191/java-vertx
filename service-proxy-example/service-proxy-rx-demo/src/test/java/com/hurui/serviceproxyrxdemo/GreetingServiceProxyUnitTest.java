@@ -25,7 +25,7 @@ public class GreetingServiceProxyUnitTest {
 	
 	@Test
 	void helloServiceTest (Vertx vertx, VertxTestContext vertxTestContext) {
-		logger.info("this is a modular test");
+		logger.info("Test #1: GreetingService - Method: [rxHello()]");
 		GreetingService greetingService = GreetingService.create();
 		new ServiceBinder(vertx.getDelegate())
 			.setAddress("greetingService")
@@ -34,15 +34,17 @@ public class GreetingServiceProxyUnitTest {
 		com.hurui.serviceproxy.reactivex.GreetingService greetingServiceProxy = GreetingService.createProxy(vertx.getDelegate(), "greetingService");
 		greetingServiceProxy.rxHello()
 			.subscribe(onSuccess -> {
+				logger.info("Test passed. Response from service impl: {}", onSuccess);
 				vertxTestContext.completeNow();
 			}, onError -> {
+				logger.error("Test failed, stacktrace: ", onError);
 				vertxTestContext.failNow(onError);
 			});
 	}
 	
 	@Test
 	void goodbyeServiceTest (Vertx vertx, VertxTestContext vertxTestContext) {
-		logger.info("this is a modular test");
+		logger.info("Test #2: GreetingService - Method: [rxGoodbye()]");
 		GreetingService greetingService = GreetingService.create();
 		new ServiceBinder(vertx.getDelegate())
 			.setAddress("greetingService")
@@ -51,8 +53,10 @@ public class GreetingServiceProxyUnitTest {
 		com.hurui.serviceproxy.reactivex.GreetingService greetingServiceProxy = GreetingService.createProxy(vertx.getDelegate(), "greetingService");
 		greetingServiceProxy.rxGoodbye()
 			.subscribe(onSuccess -> {
+				logger.info("Test passed. Response from service impl: {}", onSuccess);
 				vertxTestContext.completeNow();
 			}, onError -> {
+				logger.error("Test failed, stacktrace: ", onError);
 				vertxTestContext.failNow(onError);
 			});
 	}
