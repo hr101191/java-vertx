@@ -14,7 +14,7 @@
 	<properties>
 		<main.class>com.hurui.vertxguicedemo.VertxGuiceDemoApplication</main.class>
 		<java.version>1.8</java.version>
-		<vertx.version>3.9.1</vertx.version>
+		<vertx.version>3.9.4</vertx.version>
 	</properties>
 	
 	<dependencies>
