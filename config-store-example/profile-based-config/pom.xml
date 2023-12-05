@@ -13,7 +13,7 @@
 		<main.class>com.hurui.profilebasedconfig.ProfileBasedConfigApplication</main.class>
 		<java.version>1.8</java.version>
 		<vertx.version>3.9.4</vertx.version>
-		<logback.version>1.2.3</logback.version>
+		<logback.version>1.2.13</logback.version>
 	</properties>
 
 	<dependencies>
